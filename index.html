@@ -6,178 +6,223 @@
     <title>LEGO News Live 2PPL</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <style>
         /* --- STILI BASE --- */
         :root {
-            --bg-body: #FFFFFF; --bg-sidebar: #F2F2F7; --bg-card: #FFFFFF; --bg-input: #F5F5F7;
-            --text-main: #1D1D1F; --text-sec: #86868B; --border: #E5E5EA;
-            --accent: #0071E3; --danger: #FF3B30;
-            --radius: 18px; --radius-img: 12px;
-            --shadow-sm: 0 4px 12px rgba(0,0,0,0.04);
-            --shadow-md: 0 10px 30px rgba(0,0,0,0.1);
+            --bg-body: #F5F5F7;
+            --bg-sidebar: #FFFFFF;
+            --bg-card: #FFFFFF;
+            --bg-input: #F2F2F7;
+            --text-main: #1D1D1F;
+            --text-sec: #86868B;
+            --accent: #007AFF;
+            --danger: #FF3B30;
+            --success: #34C759;
+            --radius: 24px; 
             --font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             --sidebar-width: 300px;
         }
 
         body.dark-mode {
             --bg-body: #000000; --bg-sidebar: #1C1C1E; --bg-card: #1C1C1E; --bg-input: #2C2C2E;
-            --text-main: #F5F5F7; --text-sec: #98989D; --border: #38383A;
-            --shadow-sm: 0 4px 12px rgba(0,0,0,0.3); --shadow-md: 0 10px 30px rgba(0,0,0,0.5);
+            --text-main: #F5F5F7; --text-sec: #98989D; --accent: #0A84FF;
         }
 
         body { 
-            font-family: var(--font); 
-            background-color: var(--bg-body); 
-            color: var(--text-main); 
-            margin: 0; 
-            padding: 0; 
-            display: flex; 
-            height: 100vh; 
-            overflow: hidden; 
+            font-family: var(--font); background-color: var(--bg-body); color: var(--text-main); 
+            margin: 0; padding: 0; display: flex; height: 100vh; overflow: hidden; 
             transition: background-color 0.3s, color 0.3s; 
         }
 
-        /* --- UI ELEMENTS VISIBILITY (ADMIN) --- */
         .admin-only { display: none !important; }
         body.is-admin .admin-only { display: flex !important; }
-        body.is-admin .live-item .live-actions { display: flex !important; visibility: hidden; }
-        body.is-admin .live-item:hover .live-actions { visibility: visible; }
 
-        /* --- LANDING PAGE --- */
-        #landingPage {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background-color: #F5F5F7; 
-            z-index: 5000; 
-            overflow-y: auto;
-            transition: opacity 0.5s ease, visibility 0.5s;
-            -webkit-overflow-scrolling: touch;
-            /* Padding per evitare il taglio su mobile nella landing */
-            padding-top: env(safe-area-inset-top);
+        /* --- TOGGLE APPLE --- */
+        .admin-toggle-container {
+            position: absolute; top: 10px; right: 10px; z-index: 50;
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px);
+            padding: 4px 8px 4px 10px; border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2); pointer-events: auto;
         }
+        .toggle-status-label { color: white; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .apple-switch { position: relative; display: inline-block; width: 36px; height: 20px; }
+        .apple-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #8E8E93; transition: .3s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+        input:checked + .slider { background-color: var(--success); }
+        input:checked + .slider:before { transform: translateX(16px); }
+
+        /* --- ANIMAZIONE BOOM --- */
+        .bomb-container { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; cursor: pointer; margin-right: 2px; position: relative; pointer-events: auto; }
+        .bomb-icon { font-size: 18px; transition: transform 0.2s; display: block; }
+        .boom-img { width: 26px; height: 26px; display: none; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .bomb-container.exploded .bomb-icon { display: none; }
+        .bomb-container.exploded .boom-img { display: block; }
+        @keyframes popIn { 0% { transform: scale(0) rotate(-45deg); opacity: 0; } 60% { transform: scale(1.3) rotate(10deg); opacity: 1; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
+
+        /* --- LANDING --- */
+        #landingPage { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #F5F5F7; z-index: 5000; overflow-y: auto; transition: opacity 0.5s ease, visibility 0.5s; padding-top: env(safe-area-inset-top); -webkit-overflow-scrolling: touch; }
         #landingPage.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-
-        @keyframes float {
-            0% { transform: translate(0px, 0px) scale(1); }
-            33% { transform: translate(30px, -50px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
-            100% { transform: translate(0px, 0px) scale(1); }
-        }
+        @keyframes float { 0% { transform: translate(0px, 0px) scale(1); } 33% { transform: translate(30px, -50px) scale(1.1); } 66% { transform: translate(-20px, 20px) scale(0.9); } 100% { transform: translate(0px, 0px) scale(1); } }
         .blob-anim { animation: float 10s infinite ease-in-out; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
 
-        /* --- LAYOUT APP --- */
+        /* --- LAYOUT --- */
         #appContainer { display: flex; width: 100%; height: 100%; opacity: 0; transition: opacity 0.5s ease 0.3s; }
         #appContainer.visible { opacity: 1; }
 
-        /* SIDEBAR DESKTOP */
-        .sidebar { 
-            width: var(--sidebar-width); 
-            background-color: var(--bg-sidebar); 
-            border-right: 1px solid var(--border); 
-            display: flex; flex-direction: column; 
-            padding: 20px 15px; 
-            /* Aggiunto padding safe area per sidebar desktop/tablet */
-            padding-top: max(20px, env(safe-area-inset-top)); 
-            flex-shrink: 0; 
-            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); 
-            overflow: hidden; 
-            white-space: nowrap; 
-            z-index: 100; 
-        }
+        .sidebar { width: var(--sidebar-width); background-color: var(--bg-sidebar); border-right: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; padding: 20px 15px; padding-top: max(20px, env(safe-area-inset-top)); flex-shrink: 0; transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); overflow: hidden; white-space: nowrap; z-index: 100; }
         .sidebar.collapsed { width: 0; padding: 0; opacity: 0; border: none; }
-
         .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 5px; }
-        .sidebar-title { font-size: 22px; font-weight: 700; margin: 0; color: var(--text-main); }
+        .sidebar-title { font-size: 20px; font-weight: 700; margin: 0; color: var(--text-main); }
         .add-live-btn { background: none; border: none; color: var(--accent); font-size: 24px; cursor: pointer; padding: 0; }
         
         .live-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; flex: 1; }
-        .live-item { padding: 14px 15px; margin-bottom: 5px; border-radius: 12px; cursor: pointer; font-size: 16px; font-weight: 500; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; color: var(--text-main); }
-        .live-item:hover { background-color: rgba(128,128,128,0.1); }
-        .live-item.active { background-color: var(--bg-input); font-weight: 700; color: var(--accent); }
+        .live-item { padding: 12px 15px; margin-bottom: 4px; border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 500; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; color: var(--text-main); }
+        .live-item:hover { background-color: rgba(0,0,0,0.05); }
+        .live-item.active { background-color: var(--bg-input); font-weight: 600; color: var(--accent); }
         
-        .main-content { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            background-color: var(--bg-body); 
-            overflow-y: auto; 
-            padding: 20px; 
-            position: relative; 
-            /* CORREZIONE CRUCIALE PER MOBILE: Safe Area + Padding Base */
-            padding-top: max(20px, env(safe-area-inset-top) + 20px); 
-        }
+        .live-actions { display: flex; gap: 8px; align-items: center; }
+        .action-btn { background: transparent; border: none; padding: 6px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-sec); transition: 0.2s; }
+        .action-btn:hover { background: rgba(0,0,0,0.05); color: var(--text-main); }
+        .action-btn.delete-btn:hover { color: var(--danger); background: rgba(255, 59, 48, 0.1); }
+        .action-btn svg { width: 16px; height: 16px; stroke-width: 2; }
+
+        .main-content { flex: 1; display: flex; flex-direction: column; background-color: var(--bg-body); overflow-y: auto; padding: 30px; position: relative; padding-top: max(20px, env(safe-area-inset-top) + 20px); }
         
-        .top-bar-controls { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-        .icon-btn { background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; width: 44px; height: 44px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-main); font-size: 20px; transition: background 0.2s; }
-        .icon-btn:hover { background: var(--border); }
+        .top-bar-controls { display: flex; align-items: center; gap: 12px; margin-bottom: 30px; }
+        .icon-btn { background: var(--bg-card); border: 1px solid transparent; box-shadow: 0 2px 6px rgba(0,0,0,0.05); border-radius: 50%; width: 44px; height: 44px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-main); font-size: 20px; transition: 0.2s; }
+        .icon-btn:hover { transform: scale(1.05); }
         .icon-btn svg { display: block; }
 
-        .main-header { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-bottom: 30px; width: 100%; }
-        .header-top-row { display: flex; justify-content: center; align-items: center; width: 100%; position: relative; padding: 10px 0; }
-        .header-title-group { display: flex; flex-direction: column; align-items: center; gap: 10px; justify-content: center; text-align: center; }
+        /* --- HEADER LIVE (TITOLO GIGANTESCO A SINISTRA) --- */
+        .main-header { display: flex; flex-direction: column; align-items: flex-start; gap: 15px; margin-bottom: 50px; width: 100%; text-align: left; }
+        .header-top-row { display: flex; justify-content: space-between; align-items: center; width: 100%; position: relative; }
         
+        .header-title-group { display: flex; flex-direction: row; align-items: center; gap: 20px; flex-wrap: wrap; }
+        
+        /* Titolo ENORME */
         h1 { 
-            font-weight: 800; 
-            font-size: 32px; 
-            letter-spacing: -0.5px; 
+            font-weight: 900; 
+            font-size: 64px; /* Mobile: Molto Grande (era 40/50px) */
+            letter-spacing: -2px; 
             margin: 0; 
             color: var(--text-main); 
-            line-height: 1.1;
+            line-height: 0.95;
         }
-        
-        .logo-container { display: flex; align-items: center; gap: 15px; justify-content: center; margin-bottom: 5px; }
-        .header-logo { 
-            height: 60px; 
-            width: auto; 
-            object-fit: contain; 
-            border-radius: 8px; 
-            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1));
-        }
+        @media (min-width: 768px) { h1 { font-size: 120px; } } /* Desktop: GIGANTE */
 
-        .btn-add-news { background-color: var(--text-main); color: var(--bg-body); border: none; width: 44px; height: 44px; border-radius: 50%; font-size: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); position: absolute; right: 0; top: 0; transition: transform 0.2s; z-index: 10; }
+        .logo-container { display: flex; align-items: center; gap: 15px; }
+        .header-logo { height: 45px; width: auto; object-fit: contain; border-radius: 8px; }
+        @media (min-width: 768px) { .header-logo { height: 75px; } }
+
+        .btn-add-news { background-color: var(--text-main); color: var(--bg-body); border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s; margin-left: auto; }
         .btn-add-news:hover { transform: scale(1.05); }
 
-        .nav-pills { display: flex; background: var(--bg-input); padding: 5px; border-radius: 14px; gap: 6px; flex-wrap: wrap; justify-content: center; width: fit-content; margin: 0 auto; }
-        .nav-item { padding: 8px 18px; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--text-sec); transition: 0.2s; white-space: nowrap; }
-        .nav-item.active { background-color: var(--bg-card); color: var(--text-main); box-shadow: 0 2px 8px rgba(0,0,0,0.08); font-weight: 700; }
+        .nav-pills { display: flex; background: rgba(120,120,128,0.12); padding: 4px; border-radius: 12px; gap: 0; flex-wrap: wrap; width: fit-content; margin-top: 15px; backdrop-filter: blur(10px); }
+        .nav-item { padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--text-main); transition: 0.2s; white-space: nowrap; margin: 0 2px; }
+        .nav-item:hover { opacity: 0.7; }
+        .nav-item.active { background-color: var(--bg-card); color: var(--text-main); box-shadow: 0 3px 8px rgba(0,0,0,0.12); font-weight: 700; }
 
         .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-sec); text-align: center; padding: 20px; }
         .empty-logo-img { max-width: 80%; height: auto; max-height: 300px; margin-bottom: 20px; opacity: 0.8; transition: opacity 0.3s; }
 
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; width: 100%; }
+        /* --- GRIGLIA NEWS --- */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; width: 100%; }
 
-        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; box-shadow: var(--shadow-sm); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; gap: 12px; min-height: 280px; transform: translateZ(0); }
+        .card { 
+            background: var(--bg-card); 
+            border-radius: 28px; 
+            padding: 16px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03); 
+            cursor: pointer; 
+            transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s; 
+            display: flex; flex-direction: column; 
+            position: relative;
+        }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
         .card:active { transform: scale(0.98); }
-        .card-image-wrapper { width: 100%; height: 180px; border-radius: var(--radius-img); overflow: hidden; background-color: var(--bg-input); position: relative; pointer-events: none; }
-        .card-image-small { width: 100%; height: 100%; background-size: cover; background-position: center; }
-        .card-content { padding: 0 4px 8px 4px; display: flex; flex-direction: column; flex-grow: 1; pointer-events: none; }
+        .card.offline-mode .card-image-small { filter: grayscale(100%); opacity: 0.5; }
+        
+        /* Contenitore Immagine News */
+        .card-image-wrapper { 
+            width: 100%; height: 200px; 
+            border-radius: 20px; 
+            overflow: hidden; 
+            background-color: var(--bg-input); 
+            position: relative; 
+            margin-bottom: 16px;
+            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.15); 
+        }
+        
+        /* SEMITRASPARENZA SFUMATA REALE */
+        .card-image-small { 
+            width: 100%; height: 100%; 
+            background-size: cover; background-position: center; 
+            transition: transform 0.5s ease, opacity 0.3s ease;
+            opacity: 0.8; /* Molto trasparente di default */
+        }
+        .card:hover .card-image-small { transform: scale(1.05); opacity: 1; /* Piena visibilità all'hover */ }
+
+        .card-content { display: flex; flex-direction: column; flex-grow: 1; pointer-events: none; padding: 0 4px; }
         .card-meta-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .card-category { font-size: 11px; text-transform: uppercase; font-weight: 800; color: var(--accent); letter-spacing: 0.5px; }
-        .card-bombs { font-size: 14px; letter-spacing: 2px; }
-        .card-title { font-size: 19px; font-weight: 700; margin: 0; line-height: 1.35; color: var(--text-main); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .card-category { font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--accent); letter-spacing: 0.5px; }
+        .card-bombs { display: inline-flex; align-items: center; pointer-events: auto; }
+        
+        /* Titolo Card: Dimensioni Normali */
+        .card-title { 
+            font-size: 20px; /* Non più gigante */
+            font-weight: 700; 
+            margin: 0; 
+            line-height: 1.35; 
+            color: var(--text-main); 
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; letter-spacing: -0.3px; 
+        }
 
         /* MODALS */
         .login-form { display: flex; flex-direction: column; gap: 15px; }
         .login-title { font-size: 24px; font-weight: 700; margin-bottom: 10px; text-align: center; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; padding: 20px; padding-top: env(safe-area-inset-top); }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(20px); z-index: 6000; opacity: 0; visibility: hidden; transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; padding: 20px; padding-top: env(safe-area-inset-top); }
         .modal-overlay.active { opacity: 1; visibility: visible; }
-        .modal-card { width: 100%; max-width: 700px; height: auto; max-height: 90vh; background: var(--bg-card); border-radius: 24px; overflow: hidden; position: relative; box-shadow: 0 40px 80px rgba(0,0,0,0.4); transform: scale(0.96); transition: transform 0.3s; display: flex; flex-direction: column; color: var(--text-main); }
+        .modal-card { width: 100%; max-width: 800px; height: auto; max-height: 90vh; background: var(--bg-card); border-radius: 28px; overflow: hidden; position: relative; box-shadow: 0 40px 80px rgba(0,0,0,0.3); transform: scale(0.96); transition: transform 0.3s; display: flex; flex-direction: column; color: var(--text-main); }
         .modal-overlay.active .modal-card { transform: scale(1); }
-        .modal-scrollable { overflow-y: auto; flex: 1; }
-        .modal-header-image { height: 300px; width: 100%; background-size: cover; background-position: center; background-color: var(--bg-input); }
-        .modal-body { padding: 30px; position: relative; }
-        .close-btn { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.5); border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; z-index: 50; color: white; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .modal-scrollable { overflow-y: auto; flex: 1; padding: 25px; }
         
-        #viewCategory { font-size: 13px; font-weight: 800; color: var(--accent); text-transform: uppercase; display: inline-block; margin-bottom: 8px; letter-spacing: 0.5px; }
-        #viewBombs { font-size: 16px; margin-left: 10px; }
-        #viewTitle { font-size: 28px; font-weight: 800; line-height: 1.2; margin-bottom: 20px; }
-        #viewDesc { font-size: 18px; line-height: 1.6; white-space: pre-wrap; color: var(--text-main); font-weight: 400; }
+        .modal-header-image { 
+            height: 350px; width: 100%; 
+            border-radius: 20px; 
+            background-size: cover; background-position: center; 
+            background-color: var(--bg-input); 
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.2); 
+            margin-bottom: 25px;
+            opacity: 0.9;
+        }
         
-        .body-image-thumbnail { width: 100%; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); margin: 30px 0; }
+        .modal-body { padding: 0 10px 20px 10px; position: relative; }
+        .close-btn { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.1); border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; z-index: 50; color: var(--text-main); display: flex; align-items: center; justify-content: center; font-size: 18px; backdrop-filter: blur(10px); }
+        body.dark-mode .close-btn { background: rgba(255,255,255,0.2); color: white; }
 
-        .lightbox-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: opacity 0.3s; }
+        #viewCategory { font-size: 12px; font-weight: 700; color: var(--text-sec); text-transform: uppercase; display: inline-block; margin-bottom: 10px; letter-spacing: 1px; }
+        #viewBombs { font-size: 16px; margin-left: 10px; }
+        #viewTitle { font-size: 32px; font-weight: 800; line-height: 1.1; margin-bottom: 20px; letter-spacing: -1px; }
+        #viewDesc { font-size: 18px; line-height: 1.6; white-space: pre-wrap; color: var(--text-main); font-weight: 400; min-height: 50px; }
+        
+        .image-attachment-pill {
+            display: flex; align-items: center; gap: 12px;
+            background-color: var(--bg-input); border: 1px solid rgba(0,0,0,0.05);
+            padding: 8px 12px; border-radius: 12px; cursor: pointer;
+            margin-top: 4px; margin-bottom: 20px; width: fit-content; max-width: 100%;
+            transition: all 0.2s ease; opacity: 0; animation: fadeInPill 0.3s ease-out forwards;
+        }
+        @keyframes fadeInPill { to { opacity: 1; } }
+        .image-attachment-pill:hover { background-color: rgba(0,0,0,0.05); transform: translateY(-1px); }
+        .image-attachment-pill .icon-box { color: var(--accent); display: flex; align-items: center; justify-content: center; background: rgba(0, 122, 255, 0.1); width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; }
+        .image-attachment-pill span { font-weight: 600; font-size: 14px; color: var(--accent); line-height: 1.2; padding-top: 1px; }
+
+        .lightbox-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 7000; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: opacity 0.3s; }
         .lightbox-overlay.active { opacity: 1; visibility: visible; }
         .lightbox-img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .lightbox-close { position: absolute; top: 20px; right: 20px; color: #fff; font-size: 40px; cursor: pointer; z-index: 2001; margin-top: env(safe-area-inset-top); }
@@ -190,41 +235,17 @@
         .btn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: 600; cursor: pointer; font-size: 16px; }
         .btn-primary { background: var(--accent); color: white; }
         .btn-danger { background: var(--danger); color: white; }
-
         .loader { display: none; position: fixed; top: 20px; right: 20px; background: var(--bg-card); padding: 10px 20px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 3000; font-weight: bold; color: var(--accent); }
 
-        /* --- RESPONSIVE / MOBILE LOGIC --- */
         @media (max-width: 1024px) {
-            .sidebar { 
-                position: fixed; 
-                top: 0; left: 0; 
-                height: 100%; width: 100%; 
-                z-index: 200; 
-                transform: translateX(0); 
-                border-right: none; 
-                /* Padding extra per header safe area quando la sidebar è aperta */
-                padding-top: calc(env(safe-area-inset-top) + 80px); 
-                background-color: var(--bg-body); 
-            }
-            .sidebar.collapsed { 
-                transform: translateX(-100%); 
-                width: 100%; 
-                opacity: 0; 
-            }
+            .sidebar { position: fixed; top: 0; left: 0; height: 100%; width: 100%; z-index: 200; transform: translateX(0); border-right: none; padding-top: calc(env(safe-area-inset-top) + 80px); background-color: var(--bg-body); }
+            .sidebar.collapsed { transform: translateX(-100%); width: 100%; opacity: 0; }
             .sidebar-header { justify-content: center; margin-bottom: 30px; }
-            
-            h1 { font-size: 28px; }
-            .header-logo { height: 50px; }
-            
+            .header-logo { height: 40px; }
             .modal-card { height: 100%; max-height: 100%; border-radius: 0; }
-            .modal-header-image { height: 250px; }
-        }
-
-        /* Desktop */
-        @media (min-width: 1025px) {
-            h1 { font-size: 52px; }
-            .header-logo { height: 80px; }
-            .header-title-group { flex-direction: row; gap: 30px; }
+            .modal-header-image { height: 250px; border-radius: 16px; margin-bottom: 15px; } 
+            .modal-scrollable { padding: 20px; }
+            .modal-body { padding: 0; }
         }
     </style>
 </head>
@@ -238,113 +259,63 @@
             <div class="absolute top-[20%] left-[-10%] w-[600px] h-[600px] bg-blue-500 rounded-full mix-blend-multiply filter blur-[120px] opacity-20 blob-anim" style="animation-delay: 2s"></div>
             <div class="absolute bottom-[-10%] right-[20%] w-[400px] h-[400px] bg-indigo-400 rounded-full mix-blend-multiply filter blur-[100px] opacity-20 blob-anim" style="animation-delay: 4s"></div>
         </div>
-
         <main class="w-full min-h-full flex flex-col justify-center max-w-7xl mx-auto px-4 py-10 md:py-16 overflow-y-auto">
-            
             <header class="text-center mb-10 md:mb-16 space-y-4">
                 <img id="landingLogo" src="LOGO-fondo BIANCO-2026.png" alt="LEGO News 2PPL" class="h-28 md:h-40 mx-auto mb-6 object-contain transition-all duration-300 drop-shadow-lg">
-                
-                <p class="text-lg md:text-2xl text-slate-500 max-w-2xl mx-auto font-light leading-relaxed">
-                    La piattaforma definitiva per seguire le News delle Live 2PPL.
-                </p>
-                <div class="flex justify-center pt-6">
-                    <button onclick="enterApp()" class="bg-slate-900 text-white px-10 py-4 rounded-full font-bold text-lg hover:bg-slate-800 transition shadow-xl transform active:scale-95 cursor-pointer">
-                        Entra nelle News
-                    </button>
-                </div>
+                <p class="text-lg md:text-2xl text-slate-500 max-w-2xl mx-auto font-light leading-relaxed">La piattaforma definitiva per seguire le News della Live 2PPL.</p>
+                <div class="flex justify-center pt-6"><button onclick="enterApp()" class="bg-slate-900 text-white px-10 py-4 rounded-full font-bold text-lg hover:bg-slate-800 transition shadow-xl transform active:scale-95 cursor-pointer">Entra nelle News</button></div>
             </header>
-
             <div class="grid grid-cols-1 landscape:grid-cols-2 md:grid-cols-3 gap-5 w-full max-w-5xl mx-auto pb-12">
-
                 <div onclick="enterApp()" class="col-span-1 landscape:col-span-2 md:col-span-2 bg-white/60 backdrop-blur-xl border border-white/40 p-6 md:p-8 rounded-[28px] shadow-sm hover:shadow-lg active:scale-[0.98] transition duration-200 relative overflow-hidden group cursor-pointer">
                     <div class="relative z-10">
-                        <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
-                        </div>
-                        <h3 class="text-2xl font-bold mb-2">Dashboard Intelligente</h3>
-                        <p class="text-slate-500 text-lg">Tutte le news e le indiscrezioni. Clicca per esplorare.</p>
+                        <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg></div>
+                        <h3 class="text-2xl font-bold mb-2">Dashboard Intelligente</h3><p class="text-slate-500 text-lg">Tutte le news e le indiscrezioni.</p>
                     </div>
                 </div>
-
                 <div onclick="enterLatestLive()" class="col-span-1 bg-gradient-to-b from-slate-900 to-slate-800 text-white p-6 md:p-8 rounded-[28px] shadow-xl hover:shadow-2xl active:scale-[0.98] transition duration-200 relative overflow-hidden group cursor-pointer min-h-[220px] flex flex-col justify-between">
                     <div class="absolute top-0 right-0 w-64 h-64 bg-purple-500 rounded-full filter blur-[80px] opacity-30 group-hover:opacity-50 transition"></div>
                     <div class="flex justify-between items-start relative z-10">
-                        <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
-                        </div>
-                        <span class="bg-red-500/20 text-red-300 text-xs font-bold px-3 py-1 rounded-full border border-red-500/30 flex items-center gap-2">
-                            <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> LIVE
-                        </span>
+                        <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg></div>
+                        <span class="bg-red-500/20 text-red-300 text-xs font-bold px-3 py-1 rounded-full border border-red-500/30 flex items-center gap-2"><span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> LIVE</span>
                     </div>
-                    <div class="relative z-10 mt-4">
-                        <h3 class="text-2xl font-bold mb-1">L'ultima Live in onda</h3>
-                        <p class="text-slate-300 text-sm">Accedi subito.</p>
-                    </div>
+                    <div class="relative z-10 mt-4"><h3 class="text-2xl font-bold mb-1">L'ultima Live</h3><p class="text-slate-300 text-sm">Accedi subito.</p></div>
                 </div>
-
                 <div class="col-span-1 landscape:col-span-1 md:col-span-3 bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-[28px] shadow-sm flex items-center gap-5">
-                    <div class="shrink-0 w-14 h-14 bg-green-100 rounded-full flex items-center justify-center text-green-600">
-                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-bold">Privacy & Gestione</h3>
-                        <p class="text-slate-500 text-sm">Community moderata.</p>
-                    </div>
+                    <div class="shrink-0 w-14 h-14 bg-green-100 rounded-full flex items-center justify-center text-green-600"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
+                    <div><h3 class="text-lg font-bold">Privacy & Gestione</h3><p class="text-slate-500 text-sm">Community moderata.</p></div>
                 </div>
             </div>
-            
-            <footer class="mt-8 text-center text-slate-400 text-sm pb-8">
-                &copy; Pensato per la Community 2PPL 
-            </footer>
+            <footer class="mt-8 text-center text-slate-400 text-sm pb-8">&copy; 2026 Progettato per la Community 2PPL </footer>
         </main>
     </div>
 
     <div id="appContainer" style="display:none;">
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <h2 class="sidebar-title">Seleziona Live</h2>
-                <button class="add-live-btn admin-only" onclick="createNewLive()">+</button>
-            </div>
+            <div class="sidebar-header"><h2 class="sidebar-title">Seleziona Live</h2><button class="add-live-btn admin-only" onclick="createNewLive()">+</button></div>
             <ul class="live-list" id="liveList"></ul>
         </aside>
-
         <main class="main-content">
             <div class="top-bar-controls">
-                <button class="icon-btn" onclick="toggleSidebar()" title="Menu">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                </button>
-                <button class="icon-btn" onclick="toggleDarkMode()" title="Dark Mode">
-                    <span id="darkModeIcon" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;"></span>
-                </button>
-                <button class="icon-btn" onclick="toggleLogin()" title="Admin Login" style="margin-left: auto;">
-                    <span id="authIcon" style="display: flex; align-items: center; justify-content: center;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                    </span>
-                </button>
+                <button class="icon-btn" onclick="toggleSidebar()" title="Menu"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+                <button class="icon-btn" onclick="toggleDarkMode()" title="Dark Mode"><span id="darkModeIcon" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;"></span></button>
+                <button class="icon-btn" onclick="toggleLogin()" title="Admin Login" style="margin-left: auto;"><span id="authIcon" style="display: flex; align-items: center; justify-content: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span></button>
             </div>
-
             <header class="main-header" id="mainHeader" style="display:none;">
                 <div class="header-top-row">
-                    <button class="btn-add-news admin-only" onclick="openEditModal()">+</button>
-                    
                     <div class="header-title-group">
-                        <div class="logo-container">
-                            <img src="logo.png" alt="Logo" class="header-logo" onerror="this.style.display='none'">
-                            <img src="LOGO-fondo BIANCO-2026.png" alt="Logo 2PPL" class="header-logo" onerror="this.style.display='none'">
-                        </div>
                         <h1 id="headerTitle">Titolo Live</h1>
+                        <div class="logo-container"><img src="logo.png" alt="Logo" class="header-logo" onerror="this.style.display='none'"><img src="LOGO-fondo BIANCO-2026.png" alt="Logo 2PPL" class="header-logo" onerror="this.style.display='none'"></div>
                     </div>
+                    <button class="btn-add-news admin-only" onclick="openEditModal()">+</button>
                 </div>
                 <div class="nav-pills" id="navPillsContainer"></div>
             </header>
-
             <div id="emptyState" class="empty-state">
                 <img id="emptyStateLogo" class="empty-logo-img" src="" alt="Scegli una live">
                 <h3 class="text-xl font-bold mt-4">Nessuna Live Selezionata</h3>
                 <p class="text-slate-500 mt-2">Apri il menu per scegliere cosa guardare.</p>
                 <button onclick="toggleSidebar()" class="mt-6 bg-slate-200 text-slate-800 px-6 py-3 rounded-xl font-bold">Apri Menu</button>
             </div>
-
             <div class="grid-container" id="newsGrid"></div>
         </main>
     </div>
@@ -355,14 +326,8 @@
                 <button class="close-btn" onclick="closeLoginModal()" style="color:white; background:rgba(0,0,0,0.2);">✕</button>
                 <h2 class="login-title">Admin Login</h2>
                 <form class="login-form" onsubmit="handleLogin(event)">
-                    <div class="form-group">
-                        <label class="form-label">Email</label>
-                        <input type="email" name="email" id="loginEmail" class="form-input" autocomplete="username" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Password</label>
-                        <input type="password" name="password" id="loginPass" class="form-input" autocomplete="current-password" required>
-                    </div>
+                    <div class="form-group"><label class="form-label">Email</label><input type="email" name="email" id="loginEmail" class="form-input" autocomplete="username" required></div>
+                    <div class="form-group"><label class="form-label">Password</label><input type="password" name="password" id="loginPass" class="form-input" autocomplete="current-password" required></div>
                     <div id="loginError" class="text-red-500 text-sm hidden bg-red-50 p-3 rounded-lg border border-red-100"></div>
                     <button type="submit" class="btn btn-primary">Accedi</button>
                 </form>
@@ -378,8 +343,8 @@
                 <div class="modal-body">
                     <div><span id="viewCategory">CATEGORIA</span><span id="viewBombs"></span></div>
                     <h2 id="viewTitle">Titolo</h2>
-                    <div id="viewLoading" style="display:none; color: var(--text-sec); margin: 20px 0;">Caricamento...</div>
                     <div id="viewDesc"></div> 
+                    <div id="viewImagesContainer"></div>
                     <div class="btn-group admin-only mt-8"><button class="btn btn-text" onclick="switchToEdit()">Modifica News</button></div>
                 </div>
             </div>
@@ -434,12 +399,19 @@
 
         function getBombString(level) {
             const n = parseInt(level) || 1;
-            if(n === 3) return "💣💣💣";
-            if(n === 2) return "💣💣";
-            return "💣";
+            let html = '';
+            for(let i=0; i<n; i++) {
+                html += `<div class="bomb-container" onclick="toggleBomb(event, this)"><span class="bomb-icon">💣</span><img src="boom.png" class="boom-img" alt="Boom"></div>`;
+            }
+            return html;
         }
         function showLoader() { document.getElementById('loader').style.display = 'block'; }
         function hideLoader() { document.getElementById('loader').style.display = 'none'; }
+
+        function toggleBomb(e, el) {
+            e.stopPropagation();
+            el.classList.toggle('exploded');
+        }
 
         async function checkSession() {
             const { data: { session } } = await supabase.auth.getSession();
@@ -456,6 +428,7 @@
                 document.body.classList.remove('is-admin');
                 authIcon.innerHTML = ICON_LOCKED;
             }
+            if(activeLiveId) refreshUI();
         }
 
         function toggleLogin() {
@@ -475,14 +448,12 @@
             const pass = document.getElementById('loginPass').value;
             const errorDiv = document.getElementById('loginError');
             errorDiv.classList.add('hidden');
-
             const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
             if (!strongPasswordRegex.test(pass)) {
                 errorDiv.innerText = "Password debole: Min 8 caratteri, maiuscola, minuscola, numero.";
                 errorDiv.classList.remove('hidden');
                 return;
             }
-
             const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
             if (error) {
                 errorDiv.innerText = "Errore: " + error.message;
@@ -544,7 +515,6 @@
                 app.style.display = 'flex';
                 setTimeout(() => app.classList.add('visible'), 50);
                 selectLive(allLives[0]);
-                // LOGICA CHIAVE: Chiudi sidebar se < 1024px
                 if(window.innerWidth < 1024) {
                     document.getElementById('sidebar').classList.add('collapsed');
                 } else {
@@ -570,7 +540,7 @@
             lives.forEach(live => {
                 const li = document.createElement('li');
                 li.className = `live-item ${live.id === activeLiveId ? 'active' : ''}`;
-                li.innerHTML = `<span>${live.name}</span><div class="live-actions"><button class="action-btn" onclick="renameLive(event, ${live.id}, '${live.name}')">✏️</button><button class="action-btn delete-btn" onclick="deleteLive(event, ${live.id})">🗑</button></div>`;
+                li.innerHTML = `<span>${live.name}</span><div class="live-actions"><button class="action-btn" title="Rinomina" onclick="renameLive(event, ${live.id}, '${live.name}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button><button class="action-btn delete-btn" title="Elimina" onclick="deleteLive(event, ${live.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div>`;
                 li.onclick = () => selectLive(live);
                 list.appendChild(li);
             });
@@ -621,10 +591,7 @@
             document.getElementById('mainHeader').style.display = 'flex';
             document.getElementById('headerTitle').innerText = live.name;
             loadNews(live.id);
-            // Chiudi sidebar se schermo piccolo
-            if(window.innerWidth < 1024) {
-                 document.getElementById('sidebar').classList.add('collapsed');
-            }
+            if(window.innerWidth < 1024) document.getElementById('sidebar').classList.add('collapsed');
         }
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
 
@@ -632,7 +599,7 @@
             showLoader();
             const { data: news, error } = await supabase
                 .from('news')
-                .select('id, live_id, title, category, likelihood, cover_image, order')
+                .select('id, live_id, title, category, likelihood, cover_image, order, is_online')
                 .eq('live_id', liveId)
                 .order('order', { ascending: true });
             if (error) { alert(error.message); hideLoader(); return; }
@@ -640,6 +607,18 @@
             news.forEach(n => { if(n.category) allCategories.add(n.category); });
             refreshUI();
             hideLoader();
+        }
+
+        async function toggleNewsStatus(id, newStatus) {
+            const newsItem = cachedNews.find(n => n.id === id);
+            if (newsItem) newsItem.is_online = newStatus;
+            refreshUI(); 
+            const { error } = await supabase.from('news').update({ is_online: newStatus }).eq('id', id);
+            if (error) {
+                alert("Errore aggiornamento: " + error.message);
+                if (newsItem) newsItem.is_online = !newStatus;
+                refreshUI();
+            }
         }
 
         function refreshUI() {
@@ -677,26 +656,52 @@
             grid.innerHTML = '';
             let filtered = cachedNews;
             if(currentFilter !== 'Tutti') filtered = cachedNews.filter(n => n.category === currentFilter);
+            if (!isAdmin) filtered = filtered.filter(n => n.is_online === true);
+
             const fragment = document.createDocumentFragment();
-            filtered.forEach(item => {
+            filtered.forEach((item, index) => {
                 const card = document.createElement('div');
                 card.className = 'card';
+                if (isAdmin && !item.is_online) card.classList.add('offline-mode');
                 if(isAdmin) card.draggable = true; 
                 card.dataset.id = item.id;
+                
                 if(isAdmin) {
                     card.addEventListener('dragstart', handleDragStart);
                     card.addEventListener('dragover', handleDragOver);
                     card.addEventListener('drop', handleDrop);
                     card.addEventListener('dragend', handleDragEnd);
                 }
-                card.onclick = (e) => { if(!card.classList.contains('dragging')) openViewModal(item); }; 
+                card.onclick = (e) => { 
+                    if(e.target.closest('.admin-toggle-container') || e.target.closest('.bomb-container') || card.classList.contains('dragging')) return;
+                    openViewModal(item); 
+                }; 
+                
+                let toggleHTML = '';
+                if (isAdmin) {
+                    toggleHTML = `
+                        <div class="admin-toggle-container" onclick="event.stopPropagation()">
+                            <span class="toggle-status-label">${item.is_online ? 'ON' : 'OFF'}</span>
+                            <label class="apple-switch">
+                                <input type="checkbox" ${item.is_online ? 'checked' : ''} onchange="toggleNewsStatus(${item.id}, this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    `;
+                }
+
                 const bg = item.cover_image ? `url('${item.cover_image}')` : 'linear-gradient(135deg, #f0f0f0, #e0e0e0)';
                 card.innerHTML = `
-                    <div class="card-image-wrapper"><div class="card-image-small" style="background-image: ${bg};"></div></div>
+                    <div class="card-image-wrapper">
+                        <div class="card-image-small" style="background-image: ${bg};"></div>
+                        ${toggleHTML}
+                    </div>
                     <div class="card-content">
                         <div class="card-meta-row">
                             <span class="card-category">${item.category}</span>
-                            <span class="card-bombs">${getBombString(item.likelihood)}</span>
+                            <div class="card-bombs">
+                                ${getBombString(item.likelihood)}
+                            </div>
                         </div>
                         <h3 class="card-title">${item.title}</h3>
                     </div>
@@ -707,27 +712,57 @@
         }
         function filterNews(cat) { currentFilter = cat; refreshUI(); }
 
+        // --- FUNZIONE OPENVIEWMODAL IBRIDA (Immediata + Fetch Lazy) ---
         async function openViewModal(partialItem) {
             currentActiveNewsId = partialItem.id;
+            
             document.getElementById('viewTitle').innerText = partialItem.title;
             document.getElementById('viewCategory').innerText = partialItem.category;
-            document.getElementById('viewBombs').innerText = getBombString(partialItem.likelihood);
+            document.getElementById('viewBombs').innerText = "💣".repeat(parseInt(partialItem.likelihood) || 1);
+            
             const viewImg = document.getElementById('viewImage');
             viewImg.style.backgroundImage = partialItem.cover_image ? `url('${partialItem.cover_image}')` : 'none';
             if(!partialItem.cover_image) viewImg.style.backgroundColor = '#eee';
-            document.getElementById('viewDesc').innerHTML = '';
-            document.getElementById('viewLoading').style.display = 'block';
+            
+            document.getElementById('viewDesc').innerHTML = '<div class="flex justify-center py-10"><span class="text-slate-400 animate-pulse">Caricamento dettagli...</span></div>';
+            document.getElementById('viewImagesContainer').innerHTML = ''; 
+            
             document.getElementById('viewMode').classList.remove('hidden');
             document.getElementById('editMode').classList.add('hidden');
             document.getElementById('modalOverlay').classList.add('active');
+            
             const { data: fullItem, error } = await supabase.from('news').select('description, body_images').eq('id', partialItem.id).single();
-            document.getElementById('viewLoading').style.display = 'none';
+            
             if (!error && fullItem) {
                 currentViewImages = fullItem.body_images || [];
-                document.getElementById('viewDesc').innerHTML = formatDescription(fullItem.description, currentViewImages);
+                const cleanText = formatDescriptionTextOnly(fullItem.description);
+                document.getElementById('viewDesc').innerHTML = cleanText;
+                
+                if (currentViewImages.length > 0) {
+                    setTimeout(() => {
+                        document.getElementById('viewImagesContainer').innerHTML = createGalleryButton(currentViewImages.length);
+                    }, 100); 
+                }
             } else {
-                document.getElementById('viewDesc').innerHTML = "<p>Impossibile caricare i dettagli.</p>";
+                document.getElementById('viewDesc').innerHTML = "<p class='text-red-500'>Errore caricamento.</p>";
             }
+        }
+
+        function formatDescriptionTextOnly(text) {
+            if(!text) return '';
+            let s = text.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+            s = s.replace(/(\r\n|\n|\r)*\s*\[\[IMMAGINE \d+\]\]\s*(\r\n|\n|\r)*/g, ''); 
+            return s;
+        }
+
+        function createGalleryButton(count) {
+            return `
+            <div class="image-attachment-pill" onclick="openLightbox(0)">
+                <div class="icon-box">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                </div>
+                <span>Visualizza Galleria (${count} foto)</span>
+            </div>`;
         }
 
         async function openEditModal(id = null) {
@@ -784,10 +819,11 @@
             showLoader();
             const { text: cleanDescription, images: cleanImages } = optimizeContent(rawDescription, tempBodyImages);
             const payload = { title, category, description: cleanDescription, likelihood, cover_image: tempCoverImage, body_images: cleanImages };
-            if(idInput) await supabase.from('news').update(payload).eq('id', idInput);
-            else {
+            if(idInput) {
+                await supabase.from('news').update(payload).eq('id', idInput);
+            } else {
                 const maxOrder = cachedNews.length > 0 ? Math.max(...cachedNews.map(n=>n.order||0)) : -1;
-                payload.live_id = activeLiveId; payload.order = maxOrder + 1;
+                payload.live_id = activeLiveId; payload.order = maxOrder + 1; payload.is_online = false;
                 await supabase.from('news').insert([payload]);
             }
             if(category) allCategories.add(category);
@@ -857,15 +893,6 @@
             }; reader.readAsDataURL(file);
         }
 
-        function formatDescription(text, imgs) {
-            if(!text) return '';
-            let s = text.replace(/&/g, "&amp;").replace(/</g, "&lt;");
-            return s.replace(/\[\[IMMAGINE (\d+)\]\]/g, (m, n) => {
-                const i = parseInt(n)-1;
-                return (imgs && imgs[i]) ? `<img src="${imgs[i]}" class="body-image-thumbnail" onclick="openLightbox(${i})" alt="Zoom">` : '';
-            });
-        }
-
         function openLightbox(i) {
             currentLightboxIndex = i; updateLightbox();
             document.getElementById('lightbox').classList.add('active');
@@ -891,7 +918,6 @@
         function handleDrop(e) { e.stopPropagation(); if(dragSrcEl!==this) { swapOrder(parseInt(dragSrcEl.dataset.id), parseInt(this.dataset.id)); } return false; }
         function handleDragEnd() { this.classList.remove('dragging'); }
         async function swapOrder(sId, tId) {
-            showLoader();
             const sIdx = cachedNews.findIndex(n=>n.id===sId);
             const tIdx = cachedNews.findIndex(n=>n.id===tId);
             if(sIdx>-1 && tIdx>-1) {
@@ -901,7 +927,6 @@
                 refreshUI(); 
                 for(let n of cachedNews) { await supabase.from('news').update({ order: n.order }).eq('id', n.id); }
             }
-            hideLoader();
         }
 
         document.getElementById('modalOverlay').addEventListener('click', (e) => { if(e.target.id === 'modalOverlay') closeModal(); });
