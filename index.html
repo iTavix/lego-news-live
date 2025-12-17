@@ -14,7 +14,7 @@
             --bg-body: #F5F5F7;
             --bg-sidebar: #FFFFFF;
             --bg-card: #FFFFFF;
-            --bg-input: #F2F2F7; /* Colore sfondo wrapper immagine */
+            --bg-input: #F2F2F7;
             --text-main: #1D1D1F;
             --text-sec: #86868B;
             --accent: #007AFF;
@@ -84,6 +84,8 @@
         .live-item { padding: 12px 15px; margin-bottom: 4px; border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 500; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; color: var(--text-main); }
         .live-item:hover { background-color: rgba(0,0,0,0.05); }
         .live-item.active { background-color: var(--bg-input); font-weight: 600; color: var(--accent); }
+        .live-info { display: flex; flex-direction: column; gap: 2px; }
+        .live-date { font-size: 11px; color: var(--text-sec); font-weight: 400; }
         
         .live-actions { display: flex; gap: 8px; align-items: center; }
         .action-btn { background: transparent; border: none; padding: 6px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-sec); transition: 0.2s; }
@@ -98,22 +100,20 @@
         .icon-btn:hover { transform: scale(1.05); }
         .icon-btn svg { display: block; }
 
-        /* --- HEADER LIVE (RIDOTTO DEL 30% RISPETTO A VERSIONE PRECEDENTE) --- */
+        /* --- HEADER LIVE --- */
         .main-header { display: flex; flex-direction: column; align-items: flex-start; gap: 15px; margin-bottom: 50px; width: 100%; text-align: left; }
         .header-top-row { display: flex; justify-content: space-between; align-items: center; width: 100%; position: relative; }
-        
         .header-title-group { display: flex; flex-direction: row; align-items: center; gap: 20px; flex-wrap: wrap; }
         
-        /* Titolo ridimensionato */
         h1 { 
             font-weight: 900; 
-            font-size: 42px !important; /* Mobile: ridotto da 60px */
+            font-size: 42px !important; 
             letter-spacing: -1.5px; 
             margin: 0; 
             color: var(--text-main); 
             line-height: 0.95;
         }
-        @media (min-width: 768px) { h1 { font-size: 76px !important; } } /* Desktop: ridotto da 110px */
+        @media (min-width: 768px) { h1 { font-size: 76px !important; } } 
 
         .logo-container { display: flex; align-items: center; gap: 15px; margin-top: 5px; }
         .header-logo { height: 40px; width: auto; object-fit: contain; border-radius: 8px; }
@@ -132,6 +132,8 @@
 
         /* --- GRIGLIA NEWS --- */
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; width: 100%; }
+        @media (max-width: 640px) { .grid-container { grid-template-columns: 1fr; } }
+        @media (min-width: 641px) and (max-width: 1024px) { .grid-container { grid-template-columns: repeat(2, 1fr); } }
 
         .card { 
             background: var(--bg-card); 
@@ -147,7 +149,6 @@
         .card:active { transform: scale(0.98); }
         .card.offline-mode .card-image-small { filter: grayscale(100%); opacity: 0.5; }
         
-        /* Contenitore Immagine News */
         .card-image-wrapper { 
             width: 100%; height: 200px; 
             border-radius: 20px; 
@@ -158,26 +159,18 @@
             box-shadow: 0 10px 30px -5px rgba(0,0,0,0.15); 
         }
 
-        /* --- EFFETTO SFUMATO DALL'ALTO (GRADIENTE) --- */
-        /* Questo overlay crea la sfumatura che "cancella" la parte alta dell'immagine fondendola con lo sfondo */
         .fade-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            /* Sfumatura dal colore di sfondo (input) solido in alto a trasparente in basso */
-            background: linear-gradient(to bottom, var(--bg-input) 0%, transparent 40%);
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, var(--bg-input) 0%, transparent 50%);
             transition: opacity 0.4s ease;
-            pointer-events: none;
-            opacity: 1; /* Visibile di default */
-            z-index: 10;
+            pointer-events: none; opacity: 1; z-index: 10;
         }
-        /* Al passaggio del mouse, la sfumatura sparisce per mostrare l'immagine intera */
         .card:hover .fade-overlay { opacity: 0; }
 
         .card-image-small { 
             width: 100%; height: 100%; 
             background-size: cover; background-position: center; 
             transition: transform 0.5s ease;
-            /* L'immagine sotto è solida (opacity 1), la sfumatura la fa l'overlay sopra */
         }
         .card:hover .card-image-small { transform: scale(1.05); }
 
@@ -197,12 +190,16 @@
 
         /* MODALS */
         .login-form { display: flex; flex-direction: column; gap: 15px; }
-        .login-title { font-size: 24px; font-weight: 700; margin-bottom: 10px; text-align: center; }
+        .login-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; text-align: center; }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(20px); z-index: 6000; opacity: 0; visibility: hidden; transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; padding: 20px; padding-top: env(safe-area-inset-top); }
         .modal-overlay.active { opacity: 1; visibility: visible; }
         .modal-card { width: 100%; max-width: 800px; height: auto; max-height: 90vh; background: var(--bg-card); border-radius: 28px; overflow: hidden; position: relative; box-shadow: 0 40px 80px rgba(0,0,0,0.3); transform: scale(0.96); transition: transform 0.3s; display: flex; flex-direction: column; color: var(--text-main); }
         .modal-overlay.active .modal-card { transform: scale(1); }
         .modal-scrollable { overflow-y: auto; flex: 1; padding: 25px; }
+
+        #loginModal .modal-card { max-width: 350px !important; border-radius: 24px; }
+        #loginModal .modal-body { padding: 30px 25px; }
+        #loginModal .form-input { padding: 10px; font-size: 15px; }
         
         .modal-header-image { 
             height: 350px; width: 100%; 
@@ -358,6 +355,7 @@
                     <h2 id="viewTitle">Titolo</h2>
                     <div id="viewDesc"></div> 
                     <div id="viewImagesContainer"></div>
+                    
                     <div class="btn-group admin-only mt-8"><button class="btn btn-text" onclick="switchToEdit()">Modifica News</button></div>
                 </div>
             </div>
@@ -390,7 +388,17 @@
     <script>
         const SUPABASE_URL = 'https://bgrwqqgoomemgggqhdyf.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJncndxcWdvb21lbWdnZ3FoZHlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU4NTY5MTAsImV4cCI6MjA4MTQzMjkxMH0.MTo1zd4XwA_lYDoCKb0GKGqmOpOSvtxZWt-Hn-U8WAU';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        let sbClient; 
+        try {
+            if(window.supabase) {
+                sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            } else {
+                console.error("Supabase library not loaded");
+            }
+        } catch (err) {
+            console.error("Supabase init error:", err);
+        }
 
         let activeLiveId = null;
         let currentFilter = 'Tutti';
@@ -427,8 +435,30 @@
         }
 
         async function checkSession() {
-            const { data: { session } } = await supabase.auth.getSession();
-            updateAuthUI(session);
+            if(!sbClient) return;
+            try {
+                const { data, error } = await sbClient.auth.getSession();
+                if (error) {
+                    if(error.message.includes("Refresh Token")) {
+                        console.warn("Token expired, logging out...");
+                        await sbClient.auth.signOut();
+                    }
+                    updateAuthUI(null);
+                } else {
+                    updateAuthUI(data.session);
+                }
+                
+                sbClient.auth.onAuthStateChange((event, session) => {
+                    if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+                        updateAuthUI(null);
+                    } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+                        updateAuthUI(session);
+                    }
+                });
+            } catch (err) {
+                console.error("Auth check failed:", err);
+                updateAuthUI(null);
+            }
         }
 
         function updateAuthUI(session) {
@@ -447,7 +477,7 @@
         function toggleLogin() {
             if (isAdmin) {
                 if(confirm("Logout?")) {
-                    supabase.auth.signOut().then(() => updateAuthUI(null));
+                    if(sbClient) sbClient.auth.signOut().then(() => updateAuthUI(null));
                 }
             } else {
                 document.getElementById('loginError').classList.add('hidden');
@@ -457,17 +487,20 @@
 
         async function handleLogin(e) {
             e.preventDefault(); 
+            if(!sbClient) return alert("Database Disconnesso");
             const email = document.getElementById('loginEmail').value;
             const pass = document.getElementById('loginPass').value;
             const errorDiv = document.getElementById('loginError');
             errorDiv.classList.add('hidden');
+
             const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
             if (!strongPasswordRegex.test(pass)) {
                 errorDiv.innerText = "Password debole: Min 8 caratteri, maiuscola, minuscola, numero.";
                 errorDiv.classList.remove('hidden');
                 return;
             }
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
+
+            const { data, error } = await sbClient.auth.signInWithPassword({ email, password: pass });
             if (error) {
                 errorDiv.innerText = "Errore: " + error.message;
                 errorDiv.classList.remove('hidden');
@@ -540,12 +573,17 @@
 
         async function initApp() { 
             initTheme(); 
-            checkSession();
-            loadLives(); 
+            if(sbClient) {
+                checkSession();
+                loadLives(); 
+            } else {
+                console.warn("Offline Mode");
+            }
         }
 
         async function loadLives() {
-            const { data: lives, error } = await supabase.from('lives').select('*').order('created_at', { ascending: false });
+            if(!sbClient) return;
+            const { data: lives, error } = await sbClient.from('lives').select('*').order('live_date', { ascending: false });
             if (error) { console.error(error); return; }
             allLives = lives || [];
             const list = document.getElementById('liveList');
@@ -553,7 +591,12 @@
             lives.forEach(live => {
                 const li = document.createElement('li');
                 li.className = `live-item ${live.id === activeLiveId ? 'active' : ''}`;
-                li.innerHTML = `<span>${live.name}</span><div class="live-actions"><button class="action-btn" title="Rinomina" onclick="renameLive(event, ${live.id}, '${live.name}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button><button class="action-btn delete-btn" title="Elimina" onclick="deleteLive(event, ${live.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div>`;
+                li.innerHTML = `
+                <div class="live-info">
+                    <span>${live.name}</span>
+                    <span class="live-date">${live.live_date || ''}</span>
+                </div>
+                <div class="live-actions"><button class="action-btn" title="Rinomina" onclick="renameLive(event, ${live.id}, '${live.name}', '${live.live_date}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button><button class="action-btn delete-btn" title="Elimina" onclick="deleteLive(event, ${live.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div>`;
                 li.onclick = () => selectLive(live);
                 list.appendChild(li);
             });
@@ -562,27 +605,32 @@
         async function createNewLive() {
             if(!isAdmin) return;
             const name = prompt("Nome Live:");
-            if(name) {
-                showLoader();
-                const { error } = await supabase.from('lives').insert([{ name: name }]);
-                if(!error) loadLives(); else { alert(error.message); hideLoader(); }
-            }
+            if(!name) return;
+            const dateStr = prompt("Data Live (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
+            
+            showLoader();
+            const { error } = await sbClient.from('lives').insert([{ name: name, live_date: dateStr }]);
+            if(!error) loadLives(); else { alert(error.message); hideLoader(); }
         }
-        async function renameLive(e, id, oldName) {
+
+        async function renameLive(e, id, oldName, oldDate) {
             e.stopPropagation(); if(!isAdmin) return;
             const newName = prompt("Nuovo nome Live:", oldName);
-            if(newName && newName !== oldName) {
+            const newDate = prompt("Nuova data Live (YYYY-MM-DD):", oldDate);
+            
+            if(newName && newDate) {
                 showLoader();
-                const { error } = await supabase.from('lives').update({ name: newName }).eq('id', id);
+                const { error } = await sbClient.from('lives').update({ name: newName, live_date: newDate }).eq('id', id);
                 if(!error) loadLives(); else { alert(error.message); hideLoader(); }
             }
         }
+
         async function deleteLive(e, id) {
             e.stopPropagation(); if(!isAdmin) return;
             if(confirm("Eliminare live?")) {
                 showLoader();
-                await supabase.from('news').delete().eq('live_id', id);
-                await supabase.from('lives').delete().eq('id', id);
+                await sbClient.from('news').delete().eq('live_id', id);
+                await sbClient.from('lives').delete().eq('id', id);
                 if(activeLiveId === id) {
                     activeLiveId = null;
                     document.getElementById('emptyState').style.display = 'flex';
@@ -594,7 +642,6 @@
             }
         }
         function selectLive(live, refreshList = true) {
-            // CHIUSURA IMMEDIATA DELLA SIDEBAR SU MOBILE
             if(window.innerWidth < 1024) document.getElementById('sidebar').classList.add('collapsed');
 
             activeLiveId = live.id;
@@ -612,9 +659,10 @@
 
         async function loadNews(liveId) {
             showLoader();
-            const { data: news, error } = await supabase
+            // Fetch description eagerly for instant modal
+            const { data: news, error } = await sbClient
                 .from('news')
-                .select('id, live_id, title, category, likelihood, cover_image, order, is_online')
+                .select('id, live_id, title, category, likelihood, cover_image, description, order, is_online')
                 .eq('live_id', liveId)
                 .order('order', { ascending: true });
             if (error) { alert(error.message); hideLoader(); return; }
@@ -628,7 +676,7 @@
             const newsItem = cachedNews.find(n => n.id === id);
             if (newsItem) newsItem.is_online = newStatus;
             refreshUI(); 
-            const { error } = await supabase.from('news').update({ is_online: newStatus }).eq('id', id);
+            const { error } = await sbClient.from('news').update({ is_online: newStatus }).eq('id', id);
             if (error) {
                 alert("Errore aggiornamento: " + error.message);
                 if (newsItem) newsItem.is_online = !newStatus;
@@ -674,7 +722,7 @@
             if (!isAdmin) filtered = filtered.filter(n => n.is_online === true);
 
             const fragment = document.createDocumentFragment();
-            filtered.forEach((item, index) => {
+            filtered.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'card';
                 if (isAdmin && !item.is_online) card.classList.add('offline-mode');
@@ -728,7 +776,7 @@
         }
         function filterNews(cat) { currentFilter = cat; refreshUI(); }
 
-        // --- FUNZIONE OPENVIEWMODAL IBRIDA (Immediata + Fetch Lazy) ---
+        // --- INSTANT MODAL OPEN (Data pre-fetched) ---
         async function openViewModal(partialItem) {
             currentActiveNewsId = partialItem.id;
             
@@ -740,27 +788,25 @@
             viewImg.style.backgroundImage = partialItem.cover_image ? `url('${partialItem.cover_image}')` : 'none';
             if(!partialItem.cover_image) viewImg.style.backgroundColor = '#eee';
             
-            document.getElementById('viewDesc').innerHTML = '<div class="flex justify-center py-10"><span class="text-slate-400 animate-pulse">Caricamento dettagli...</span></div>';
+            // Text is now instant because we fetched it in loadNews
+            const cleanText = formatDescriptionTextOnly(partialItem.description);
+            document.getElementById('viewDesc').innerHTML = cleanText;
             document.getElementById('viewImagesContainer').innerHTML = ''; 
             
             document.getElementById('viewMode').classList.remove('hidden');
             document.getElementById('editMode').classList.add('hidden');
             document.getElementById('modalOverlay').classList.add('active');
             
-            const { data: fullItem, error } = await supabase.from('news').select('description, body_images').eq('id', partialItem.id).single();
+            // Fetch heavy images in background
+            const { data: fullItem, error } = await sbClient.from('news').select('body_images').eq('id', partialItem.id).single();
             
             if (!error && fullItem) {
                 currentViewImages = fullItem.body_images || [];
-                const cleanText = formatDescriptionTextOnly(fullItem.description);
-                document.getElementById('viewDesc').innerHTML = cleanText;
-                
                 if (currentViewImages.length > 0) {
                     setTimeout(() => {
                         document.getElementById('viewImagesContainer').innerHTML = createGalleryButton(currentViewImages.length);
                     }, 100); 
                 }
-            } else {
-                document.getElementById('viewDesc').innerHTML = "<p class='text-red-500'>Errore caricamento.</p>";
             }
         }
 
@@ -793,7 +839,7 @@
             allCategories.forEach(cat => { const opt = document.createElement('option'); opt.value = cat; dl.appendChild(opt); });
             if(id) {
                 showLoader();
-                const { data: item, error } = await supabase.from('news').select('*').eq('id', id).single();
+                const { data: item, error } = await sbClient.from('news').select('*').eq('id', id).single();
                 if(error) { alert(error.message); hideLoader(); return; }
                 document.getElementById('editId').value = item.id;
                 document.getElementById('editTitle').value = item.title;
@@ -836,11 +882,11 @@
             const { text: cleanDescription, images: cleanImages } = optimizeContent(rawDescription, tempBodyImages);
             const payload = { title, category, description: cleanDescription, likelihood, cover_image: tempCoverImage, body_images: cleanImages };
             if(idInput) {
-                await supabase.from('news').update(payload).eq('id', idInput);
+                await sbClient.from('news').update(payload).eq('id', idInput);
             } else {
                 const maxOrder = cachedNews.length > 0 ? Math.max(...cachedNews.map(n=>n.order||0)) : -1;
                 payload.live_id = activeLiveId; payload.order = maxOrder + 1; payload.is_online = false;
-                await supabase.from('news').insert([payload]);
+                await sbClient.from('news').insert([payload]);
             }
             if(category) allCategories.add(category);
             loadNews(activeLiveId);
@@ -866,7 +912,7 @@
             if(!isAdmin) return;
             if(confirm("Eliminare?")) {
                 showLoader();
-                await supabase.from('news').delete().eq('id', currentActiveNewsId);
+                await sbClient.from('news').delete().eq('id', currentActiveNewsId);
                 loadNews(activeLiveId);
                 closeModal();
             }
@@ -941,7 +987,7 @@
                 cachedNews.splice(tIdx,0,m);
                 cachedNews.forEach((n,i)=>n.order=i);
                 refreshUI(); 
-                for(let n of cachedNews) { await supabase.from('news').update({ order: n.order }).eq('id', n.id); }
+                for(let n of cachedNews) { await sbClient.from('news').update({ order: n.order }).eq('id', n.id); }
             }
         }
 
