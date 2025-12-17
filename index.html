@@ -127,25 +127,61 @@
         .nav-item:hover { opacity: 0.7; }
         .nav-item.active { background-color: var(--bg-card); color: var(--text-main); box-shadow: 0 3px 8px rgba(0,0,0,0.12); font-weight: 700; }
 
-        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-sec); text-align: center; padding: 20px; }
-        .empty-logo-img { max-width: 80%; height: auto; max-height: 300px; margin-bottom: 20px; opacity: 0.8; transition: opacity 0.3s; }
+        .empty-state { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-sec); text-align: center; padding: 20px; overflow: hidden; }
+        .empty-logo-img { max-width: 80%; height: auto; max-height: 300px; margin-bottom: 20px; opacity: 0.8; transition: opacity 0.3s; position: relative; z-index: 10; }
+        
+        /* Stili per il MOSAICO Sfondo nel Menu */
+        #latestLiveBg {
+            position: relative; /* Riquadrato nel flusso */
+            width: 100%;
+            max-width: 494px; /* AUMENTATO DEL 30% (da 380px) */
+            height: 286px;    /* AUMENTATO DEL 30% (da 220px) */
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 Colonne */
+            gap: 2px;
+            border-radius: 32px; /* Angoli arrotondati */
+            overflow: hidden;
+            opacity: 0; 
+            transition: opacity 1.5s ease;
+            z-index: 1; 
+            filter: blur(3px) opacity(0.6); /* Sfocatura e Trasparenza */
+            margin-bottom: -90px; /* Margine negativo per fondersi con il logo sotto */
+            mask-image: linear-gradient(to bottom, black 30%, transparent 100%); /* Sfumatura verso il basso */
+            -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+        }
+        #latestLiveBg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
         /* --- GRIGLIA NEWS --- */
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; width: 100%; }
         @media (max-width: 640px) { .grid-container { grid-template-columns: 1fr; } }
         @media (min-width: 641px) and (max-width: 1024px) { .grid-container { grid-template-columns: repeat(2, 1fr); } }
 
+        /* --- CARD (Design macOS Tahoe/Monterey) --- */
         .card { 
             background: var(--bg-card); 
             border-radius: 28px; 
             padding: 16px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03); 
+            box-shadow: 
+                0 0 0 1px rgba(0,0,0,0.03), 
+                0 4px 12px rgba(0,0,0,0.05),
+                0 12px 30px rgba(0,0,0,0.08);
             cursor: pointer; 
-            transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s; 
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             display: flex; flex-direction: column; 
             position: relative;
         }
-        .card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .card:hover { 
+            transform: translateY(-4px); 
+            box-shadow: 
+                0 0 0 1px rgba(0,0,0,0.03), 
+                0 8px 20px rgba(0,0,0,0.06),
+                0 25px 50px rgba(0,0,0,0.12);
+            z-index: 10;
+        }
         .card:active { transform: scale(0.98); }
         .card.offline-mode .card-image-small { filter: grayscale(100%); opacity: 0.5; }
         
@@ -169,7 +205,8 @@
 
         .card-image-small { 
             width: 100%; height: 100%; 
-            background-size: cover; background-position: center; 
+            object-fit: cover; 
+            object-position: center;
             transition: transform 0.5s ease;
         }
         .card:hover .card-image-small { transform: scale(1.05); }
@@ -272,27 +309,72 @@
         <main class="w-full min-h-full flex flex-col justify-center max-w-7xl mx-auto px-4 py-10 md:py-16 overflow-y-auto">
             <header class="text-center mb-10 md:mb-16 space-y-4">
                 <img id="landingLogo" src="LOGO-fondo BIANCO-2026.png" alt="LEGO News 2PPL" class="h-28 md:h-40 mx-auto mb-6 object-contain transition-all duration-300 drop-shadow-lg">
-                <p class="text-lg md:text-2xl text-slate-500 max-w-2xl mx-auto font-light leading-relaxed">La piattaforma definitiva per restare aggiornati sulle News della Live 2PPL</p>
+                <p class="text-lg md:text-2xl text-slate-500 max-w-2xl mx-auto font-light leading-relaxed">La piattaforma definitiva per restare aggiornati sulle News della Live dei 2 Pazzi Per i Lego</p>
                 <div class="flex justify-center pt-6"><button onclick="enterApp()" class="bg-slate-900 text-white px-10 py-4 rounded-full font-bold text-lg hover:bg-slate-800 transition shadow-xl transform active:scale-95 cursor-pointer">Entra nelle News</button></div>
             </header>
             <div class="grid grid-cols-1 landscape:grid-cols-2 md:grid-cols-3 gap-5 w-full max-w-5xl mx-auto pb-12">
                 <div onclick="enterApp()" class="col-span-1 landscape:col-span-2 md:col-span-2 bg-white/60 backdrop-blur-xl border border-white/40 p-6 md:p-8 rounded-[28px] shadow-sm hover:shadow-lg active:scale-[0.98] transition duration-200 relative overflow-hidden group cursor-pointer">
                     <div class="relative z-10">
-                        <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg></div>
-                        <h3 class="text-2xl font-bold mb-2">Dashboard Intelligente</h3><p class="text-slate-500 text-lg">Tutte le news e le indiscrezioni.</p>
+                        <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><circle cx="7" cy="7" r="2.5"></circle><circle cx="17" cy="7" r="2.5"></circle><circle cx="7" cy="17" r="2.5"></circle><circle cx="17" cy="17" r="2.5"></circle></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4">Consulta le News</h3>
+                        <div class="space-y-3 text-left">
+                            <div class="flex gap-3 items-start">
+                                <div class="text-slate-900 pt-1">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <path d="m8 12 8 0"></path>
+                                        <path d="m12 8 0 8"></path>
+                                        <path d="m17 7 2-2"></path>
+                                    </svg>
+                                </div>
+                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Divertiti con noi: fai scoppiare le bombe nelle news ed assegna il tuo personale valore di "BOOM"</strong></p>
+                            </div>
+                            <div class="flex gap-3 items-start">
+                                <div class="text-slate-900 pt-1">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <arrow-up-down class="lucide lucide-arrow-up-down"></arrow-up-down>
+                                        <path d="m21 16-4 4-4-4"></path>
+                                        <path d="M17 20V4"></path>
+                                        <path d="m3 8 4-4 4 4"></path>
+                                        <path d="M7 4v16"></path>
+                                    </svg>
+                                </div>
+                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Organizza il tuo flusso:</strong> Tieni premuto e trascina le schede per riordinare il feed.</p>
+                            </div>
+                            <div class="flex gap-3 items-start">
+                                <div class="text-slate-900 pt-1">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Niente Spoiler Visivi:</strong> Immagini sfocate di default. Clicca per vederle nitide.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div onclick="enterLatestLive()" class="col-span-1 bg-gradient-to-b from-slate-900 to-slate-800 text-white p-6 md:p-8 rounded-[28px] shadow-xl hover:shadow-2xl active:scale-[0.98] transition duration-200 relative overflow-hidden group cursor-pointer min-h-[220px] flex flex-col justify-between">
                     <div class="absolute top-0 right-0 w-64 h-64 bg-purple-500 rounded-full filter blur-[80px] opacity-30 group-hover:opacity-50 transition"></div>
                     <div class="flex justify-between items-start relative z-10">
-                        <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg></div>
+                        <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m22 8-6 4 6 4V8Z"></path>
+                                <rect width="14" height="12" x="2" y="6" rx="2" ry="2"></rect>
+                            </svg>
+                        </div>
                         <span class="bg-red-500/20 text-red-300 text-xs font-bold px-3 py-1 rounded-full border border-red-500/30 flex items-center gap-2"><span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> LIVE</span>
                     </div>
+                    <img src="fotocamera.png" class="absolute bottom-[-10%] right-[-5%] w-64 opacity-10 rotate-12 z-0 pointer-events-none mix-blend-overlay" alt="">
+                    
                     <div class="relative z-10 mt-4"><h3 class="text-2xl font-bold mb-1">L'ultima Live</h3><p class="text-slate-300 text-sm">Accedi subito.</p></div>
                 </div>
                 <div class="col-span-1 landscape:col-span-1 md:col-span-3 bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-[28px] shadow-sm flex items-center gap-5">
-                    <div class="shrink-0 w-14 h-14 bg-green-100 rounded-full flex items-center justify-center text-green-600"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
-                    <div><h3 class="text-lg font-bold">Privacy & Gestione</h3><p class="text-slate-500 text-sm">Community moderata.</p></div>
+                     <div class="shrink-0 w-14 h-14 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><circle cx="7" cy="7" r="2.5"></circle><circle cx="17" cy="7" r="2.5"></circle><circle cx="7" cy="17" r="2.5"></circle><circle cx="17" cy="17" r="2.5"></circle></svg>
+                    </div>
+                    <div><h3 class="text-lg font-bold">Navigazione & Archivi</h3><p class="text-slate-500 text-sm">Usa il menu per accedere allo storico delle Live. Le notizie sono ordinate cronologicamente per data.</p></div>
                 </div>
             </div>
             <footer class="mt-8 text-center text-slate-400 text-sm pb-8">&copy; 2026 Progettato pe la Community 2PPL </footer>
@@ -321,10 +403,16 @@
                 <div class="nav-pills" id="navPillsContainer"></div>
             </header>
             <div id="emptyState" class="empty-state">
-                <img id="emptyStateLogo" class="empty-logo-img" src="" alt="Scegli una live">
-                <h3 class="text-xl font-bold mt-4">Nessuna Live Selezionata</h3>
-                <p class="text-slate-500 mt-2">Apri il menu per scegliere cosa guardare.</p>
-                <button onclick="toggleSidebar()" class="mt-6 bg-slate-200 text-slate-800 px-6 py-3 rounded-xl font-bold">Apri Menu</button>
+                <div id="latestLiveBg"></div>
+
+                <div style="position: relative; width: 208px; height: 208px; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center;">
+                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); filter: blur(24px); opacity: 0.5; border-radius: 50%; animation: pulse 3s infinite;"></div>
+                    <img id="emptyStateLogo" class="empty-logo-img" src="" alt="Scegli una live" style="position: relative; z-index: 10; width: 100%; height: 100%; object-fit: contain; margin: 0;">
+                </div>
+                
+                <h3 class="text-xl font-bold mt-4" style="position: relative; z-index: 10;">Nessuna Live Selezionata</h3>
+                <p class="text-slate-500 mt-2" style="position: relative; z-index: 10;">Apri il menu per scegliere cosa guardare.</p>
+                <button onclick="toggleSidebar()" class="mt-6 bg-slate-200 text-slate-800 px-6 py-3 rounded-xl font-bold" style="position: relative; z-index: 10;">Apri Menu</button>
             </div>
             <div class="grid-container" id="newsGrid"></div>
         </main>
@@ -355,7 +443,6 @@
                     <h2 id="viewTitle">Titolo</h2>
                     <div id="viewDesc"></div> 
                     <div id="viewImagesContainer"></div>
-                    
                     <div class="btn-group admin-only mt-8"><button class="btn btn-text" onclick="switchToEdit()">Modifica News</button></div>
                 </div>
             </div>
@@ -600,6 +687,33 @@
                 li.onclick = () => selectLive(live);
                 list.appendChild(li);
             });
+            
+            // Carica anteprima mosaico ultima live nel menu
+            if(allLives.length > 0) {
+                loadLatestLivePreview(allLives[0].id);
+            }
+        }
+        
+        async function loadLatestLivePreview(liveId) {
+            if(!sbClient || !liveId) return;
+            // Prende fino a 12 copertine per creare il mosaico
+            const { data, error } = await sbClient
+                .from('news')
+                .select('cover_image')
+                .eq('live_id', liveId)
+                .not('cover_image', 'is', null)
+                .limit(12);
+                
+            const container = document.getElementById('latestLiveBg');
+            if (container && !error && data && data.length > 0) {
+                container.innerHTML = ''; // Pulisce
+                data.forEach(item => {
+                    const img = document.createElement('img');
+                    img.src = item.cover_image;
+                    container.appendChild(img);
+                });
+                container.style.opacity = '1'; 
+            }
         }
 
         async function createNewLive() {
@@ -659,7 +773,6 @@
 
         async function loadNews(liveId) {
             showLoader();
-            // Fetch description eagerly for instant modal
             const { data: news, error } = await sbClient
                 .from('news')
                 .select('id, live_id, title, category, likelihood, cover_image, description, order, is_online')
@@ -714,6 +827,7 @@
                 if(p.innerText === currentFilter) p.classList.add('active'); else p.classList.remove('active');
             });
         }
+        
         function renderGridFromCache() {
             const grid = document.getElementById('newsGrid');
             grid.innerHTML = '';
@@ -726,6 +840,7 @@
                 const card = document.createElement('div');
                 card.className = 'card';
                 if (isAdmin && !item.is_online) card.classList.add('offline-mode');
+                
                 if(isAdmin) card.draggable = true; 
                 card.dataset.id = item.id;
                 
@@ -753,11 +868,19 @@
                     `;
                 }
 
-                const bg = item.cover_image ? `url('${item.cover_image}')` : 'linear-gradient(135deg, #f0f0f0, #e0e0e0)';
+                // Logica Tipografia: Prima parola Nera, resto Grigio
+                const titleParts = item.title.split(' ');
+                const firstWord = titleParts[0] || '';
+                const restOfTitle = titleParts.slice(1).join(' ');
+                
+                const titleHtml = `<span style="color: var(--text-main); font-weight: 800;">${firstWord}</span> <span style="color: var(--text-sec); font-weight: 500;">${restOfTitle}</span>`;
+
+                const bg = item.cover_image ? item.cover_image : '';
+                
                 card.innerHTML = `
                     <div class="card-image-wrapper">
                         <div class="fade-overlay"></div>
-                        <div class="card-image-small" style="background-image: ${bg};"></div>
+                        <img src="${bg}" class="card-image-small" loading="lazy" alt="${item.title}">
                         ${toggleHTML}
                     </div>
                     <div class="card-content">
@@ -767,16 +890,17 @@
                                 ${getBombString(item.likelihood)}
                             </div>
                         </div>
-                        <h3 class="card-title">${item.title}</h3>
+                        <h3 class="card-title">${titleHtml}</h3>
                     </div>
                 `;
                 fragment.appendChild(card);
             });
             grid.appendChild(fragment);
         }
+        
         function filterNews(cat) { currentFilter = cat; refreshUI(); }
 
-        // --- INSTANT MODAL OPEN (Data pre-fetched) ---
+        // --- APERTURA IBRIDA ---
         async function openViewModal(partialItem) {
             currentActiveNewsId = partialItem.id;
             
@@ -788,7 +912,7 @@
             viewImg.style.backgroundImage = partialItem.cover_image ? `url('${partialItem.cover_image}')` : 'none';
             if(!partialItem.cover_image) viewImg.style.backgroundColor = '#eee';
             
-            // Text is now instant because we fetched it in loadNews
+            // Testo immediato
             const cleanText = formatDescriptionTextOnly(partialItem.description);
             document.getElementById('viewDesc').innerHTML = cleanText;
             document.getElementById('viewImagesContainer').innerHTML = ''; 
@@ -797,7 +921,7 @@
             document.getElementById('editMode').classList.add('hidden');
             document.getElementById('modalOverlay').classList.add('active');
             
-            // Fetch heavy images in background
+            // Carica solo galleria in background
             const { data: fullItem, error } = await sbClient.from('news').select('body_images').eq('id', partialItem.id).single();
             
             if (!error && fullItem) {
