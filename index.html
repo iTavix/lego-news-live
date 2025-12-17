@@ -22,7 +22,7 @@
             --success: #34C759;
             --radius: 24px; 
             --font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            --sidebar-width: 300px;
+            --sidebar-width: 320px;
         }
 
         body.dark-mode {
@@ -56,13 +56,21 @@
         input:checked + .slider:before { transform: translateX(16px); }
 
         /* --- ANIMAZIONE BOOM --- */
-        .bomb-container { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; cursor: pointer; margin-right: 2px; position: relative; pointer-events: auto; }
-        .bomb-icon { font-size: 18px; transition: transform 0.2s; display: block; }
-        .boom-img { width: 26px; height: 26px; display: none; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .bomb-container.exploded .bomb-icon { display: none; }
+        .bomb-container { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; cursor: pointer; margin-right: 2px; position: relative; pointer-events: auto; }
+        
+        /* Stile per l'icona brick.png interattiva (USATA ANCHE IN LANDING) */
+        .bomb-icon-img { width: 22px; height: 22px; object-fit: contain; transition: transform 0.2s; display: block; }
+        .boom-img { width: 30px; height: 30px; display: none; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
+        /* Gestione stato esploso */
+        .bomb-container.exploded .bomb-icon-img { display: none; }
         .bomb-container.exploded .boom-img { display: block; }
+        
         @keyframes popIn { 0% { transform: scale(0) rotate(-45deg); opacity: 0; } 60% { transform: scale(1.3) rotate(10deg); opacity: 1; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
 
+        /* Stile per brick.png statici (affidabilità) */
+        .static-brick-img { display: inline-block; width: 16px; height: 16px; margin-right: 3px; object-fit: contain; vertical-align: middle; }
+        
         /* --- LANDING --- */
         #landingPage { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #F5F5F7; z-index: 5000; overflow-y: auto; transition: opacity 0.5s ease, visibility 0.5s; padding-top: env(safe-area-inset-top); -webkit-overflow-scrolling: touch; }
         #landingPage.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
@@ -81,13 +89,21 @@
         .add-live-btn { background: none; border: none; color: var(--accent); font-size: 24px; cursor: pointer; padding: 0; }
         
         .live-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; flex: 1; }
-        .live-item { padding: 12px 15px; margin-bottom: 4px; border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 500; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; color: var(--text-main); }
+        .live-item { padding: 12px 10px; margin-bottom: 6px; border-radius: 12px; cursor: pointer; font-size: 15px; font-weight: 500; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; color: var(--text-main); }
         .live-item:hover { background-color: rgba(0,0,0,0.05); }
         .live-item.active { background-color: var(--bg-input); font-weight: 600; color: var(--accent); }
-        .live-info { display: flex; flex-direction: column; gap: 2px; }
+        
+        .live-item-content { display: flex; align-items: center; gap: 10px; flex: 1; overflow: hidden; }
+        .live-yt-thumb { width: 56px; height: 32px; border-radius: 6px; overflow: hidden; flex-shrink: 0; background-color: #000; position: relative; transition: transform 0.2s; border: 1px solid rgba(0,0,0,0.1); }
+        .live-yt-thumb:hover { transform: scale(1.1); border-color: var(--accent); z-index: 10; }
+        .live-yt-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .live-yt-thumb::after { content: '▶'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 10px; opacity: 0.8; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+
+        .live-info { display: flex; flex-direction: column; gap: 1px; overflow: hidden; }
+        .live-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .live-date { font-size: 11px; color: var(--text-sec); font-weight: 400; }
         
-        .live-actions { display: flex; gap: 8px; align-items: center; }
+        .live-actions { display: flex; gap: 4px; align-items: center; margin-left: 8px; }
         .action-btn { background: transparent; border: none; padding: 6px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-sec); transition: 0.2s; }
         .action-btn:hover { background: rgba(0,0,0,0.05); color: var(--text-main); }
         .action-btn.delete-btn:hover { color: var(--danger); background: rgba(255, 59, 48, 0.1); }
@@ -130,100 +146,44 @@
         .empty-state { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-sec); text-align: center; padding: 20px; overflow: hidden; }
         .empty-logo-img { max-width: 80%; height: auto; max-height: 300px; margin-bottom: 20px; opacity: 0.8; transition: opacity 0.3s; position: relative; z-index: 10; }
         
-        /* Stili per il MOSAICO Sfondo nel Menu */
         #latestLiveBg {
-            position: relative; /* Riquadrato nel flusso */
-            width: 100%;
-            max-width: 494px; /* AUMENTATO DEL 30% (da 380px) */
-            height: 286px;    /* AUMENTATO DEL 30% (da 220px) */
-            display: grid;
-            grid-template-columns: repeat(4, 1fr); /* 4 Colonne */
-            gap: 2px;
-            border-radius: 32px; /* Angoli arrotondati */
-            overflow: hidden;
-            opacity: 0; 
-            transition: opacity 1.5s ease;
-            z-index: 1; 
-            filter: blur(3px) opacity(0.6); /* Sfocatura e Trasparenza */
-            margin-bottom: -90px; /* Margine negativo per fondersi con il logo sotto */
-            mask-image: linear-gradient(to bottom, black 30%, transparent 100%); /* Sfumatura verso il basso */
+            position: relative; width: 100%; max-width: 494px; height: 286px;    
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px;
+            border-radius: 32px; overflow: hidden; opacity: 0; transition: opacity 1.5s ease;
+            z-index: 1; filter: blur(3px) opacity(0.6); margin-bottom: -90px; 
+            mask-image: linear-gradient(to bottom, black 30%, transparent 100%); 
             -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
         }
-        #latestLiveBg img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        #latestLiveBg img { width: 100%; height: 100%; object-fit: cover; }
 
         /* --- GRIGLIA NEWS --- */
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; width: 100%; }
         @media (max-width: 640px) { .grid-container { grid-template-columns: 1fr; } }
         @media (min-width: 641px) and (max-width: 1024px) { .grid-container { grid-template-columns: repeat(2, 1fr); } }
 
-        /* --- CARD (Design macOS Tahoe/Monterey) --- */
+        /* --- CARD --- */
         .card { 
-            background: var(--bg-card); 
-            border-radius: 28px; 
-            padding: 16px; 
-            box-shadow: 
-                0 0 0 1px rgba(0,0,0,0.03), 
-                0 4px 12px rgba(0,0,0,0.05),
-                0 12px 30px rgba(0,0,0,0.08);
-            cursor: pointer; 
-            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            display: flex; flex-direction: column; 
-            position: relative;
+            background: var(--bg-card); border-radius: 28px; padding: 16px; 
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.03), 0 4px 12px rgba(0,0,0,0.05), 0 12px 30px rgba(0,0,0,0.08);
+            cursor: pointer; transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex; flex-direction: column; position: relative;
         }
-        .card:hover { 
-            transform: translateY(-4px); 
-            box-shadow: 
-                0 0 0 1px rgba(0,0,0,0.03), 
-                0 8px 20px rgba(0,0,0,0.06),
-                0 25px 50px rgba(0,0,0,0.12);
-            z-index: 10;
-        }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 0 0 1px rgba(0,0,0,0.03), 0 8px 20px rgba(0,0,0,0.06), 0 25px 50px rgba(0,0,0,0.12); z-index: 10; }
         .card:active { transform: scale(0.98); }
         .card.offline-mode .card-image-small { filter: grayscale(100%); opacity: 0.5; }
         
-        .card-image-wrapper { 
-            width: 100%; height: 200px; 
-            border-radius: 20px; 
-            overflow: hidden; 
-            background-color: var(--bg-input); 
-            position: relative; 
-            margin-bottom: 16px;
-            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.15); 
-        }
-
-        .fade-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, var(--bg-input) 0%, transparent 50%);
-            transition: opacity 0.4s ease;
-            pointer-events: none; opacity: 1; z-index: 10;
-        }
+        .card-image-wrapper { width: 100%; height: 200px; border-radius: 20px; overflow: hidden; background-color: var(--bg-input); position: relative; margin-bottom: 16px; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.15); }
+        .fade-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, var(--bg-input) 0%, transparent 50%); transition: opacity 0.4s ease; pointer-events: none; opacity: 1; z-index: 10; }
         .card:hover .fade-overlay { opacity: 0; }
-
-        .card-image-small { 
-            width: 100%; height: 100%; 
-            object-fit: cover; 
-            object-position: center;
-            transition: transform 0.5s ease;
-        }
+        .card-image-small { width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.5s ease; }
         .card:hover .card-image-small { transform: scale(1.05); }
 
         .card-content { display: flex; flex-direction: column; flex-grow: 1; pointer-events: none; padding: 0 4px; }
         .card-meta-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .card-category { font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--accent); letter-spacing: 0.5px; }
+        .card-category { font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--accent); letter-spacing: 0.5px; margin-right: 6px; }
         .card-bombs { display: inline-flex; align-items: center; pointer-events: auto; }
         
-        .card-title { 
-            font-size: 20px; 
-            font-weight: 700; 
-            margin: 0; 
-            line-height: 1.35; 
-            color: var(--text-main); 
-            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; letter-spacing: -0.3px; 
-        }
+        .card-title { font-size: 20px; font-weight: 700; margin: 0; line-height: 1.35; color: var(--text-main); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; letter-spacing: -0.3px; }
 
         /* MODALS */
         .login-form { display: flex; flex-direction: column; gap: 15px; }
@@ -238,32 +198,17 @@
         #loginModal .modal-body { padding: 30px 25px; }
         #loginModal .form-input { padding: 10px; font-size: 15px; }
         
-        .modal-header-image { 
-            height: 350px; width: 100%; 
-            border-radius: 20px; 
-            background-size: cover; background-position: center; 
-            background-color: var(--bg-input); 
-            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.2); 
-            margin-bottom: 25px;
-            opacity: 0.9;
-        }
-        
+        .modal-header-image { height: 350px; width: 100%; border-radius: 20px; background-size: cover; background-position: center; background-color: var(--bg-input); box-shadow: 0 10px 40px -10px rgba(0,0,0,0.2); margin-bottom: 25px; opacity: 0.9; }
         .modal-body { padding: 0 10px 20px 10px; position: relative; }
         .close-btn { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.1); border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; z-index: 50; color: var(--text-main); display: flex; align-items: center; justify-content: center; font-size: 18px; backdrop-filter: blur(10px); }
         body.dark-mode .close-btn { background: rgba(255,255,255,0.2); color: white; }
 
         #viewCategory { font-size: 12px; font-weight: 700; color: var(--text-sec); text-transform: uppercase; display: inline-block; margin-bottom: 10px; letter-spacing: 1px; }
-        #viewBombs { font-size: 16px; margin-left: 10px; }
+        #viewBombs { font-size: 16px; margin-left: 10px; display: inline-flex; align-items: center; } 
         #viewTitle { font-size: 32px; font-weight: 800; line-height: 1.1; margin-bottom: 20px; letter-spacing: -1px; }
         #viewDesc { font-size: 18px; line-height: 1.6; white-space: pre-wrap; color: var(--text-main); font-weight: 400; min-height: 50px; }
         
-        .image-attachment-pill {
-            display: flex; align-items: center; gap: 12px;
-            background-color: var(--bg-input); border: 1px solid rgba(0,0,0,0.05);
-            padding: 8px 12px; border-radius: 12px; cursor: pointer;
-            margin-top: 4px; margin-bottom: 20px; width: fit-content; max-width: 100%;
-            transition: all 0.2s ease; opacity: 0; animation: fadeInPill 0.3s ease-out forwards;
-        }
+        .image-attachment-pill { display: flex; align-items: center; gap: 12px; background-color: var(--bg-input); border: 1px solid rgba(0,0,0,0.05); padding: 8px 12px; border-radius: 12px; cursor: pointer; margin-top: 4px; margin-bottom: 20px; width: fit-content; max-width: 100%; transition: all 0.2s ease; opacity: 0; animation: fadeInPill 0.3s ease-out forwards; }
         @keyframes fadeInPill { to { opacity: 1; } }
         .image-attachment-pill:hover { background-color: rgba(0,0,0,0.05); transform: translateY(-1px); }
         .image-attachment-pill .icon-box { color: var(--accent); display: flex; align-items: center; justify-content: center; background: rgba(0, 122, 255, 0.1); width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; }
@@ -321,15 +266,10 @@
                         <h3 class="text-2xl font-bold mb-4">Consulta le News</h3>
                         <div class="space-y-3 text-left">
                             <div class="flex gap-3 items-start">
-                                <div class="text-slate-900 pt-1">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <path d="m8 12 8 0"></path>
-                                        <path d="m12 8 0 8"></path>
-                                        <path d="m17 7 2-2"></path>
-                                    </svg>
+                                <div class="pt-1">
+                                    <img src="brick_land.png" class="bomb-icon-img" alt="brick">
                                 </div>
-                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Divertiti con noi: fai scoppiare le bombe nelle news ed assegna il tuo personale valore di "BOOM"</strong></p>
+                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Divertiti con noi:</strong> fai scoppiare i mattoncini nelle news ed assegna il tuo personale valore alle News.</p>
                             </div>
                             <div class="flex gap-3 items-start">
                                 <div class="text-slate-900 pt-1">
@@ -351,6 +291,15 @@
                                     </svg>
                                 </div>
                                 <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Niente Spoiler Visivi:</strong> Immagini sfocate di default. Clicca per vederle nitide.</p>
+                            </div>
+                            <div class="flex gap-3 items-start">
+                                <div class="text-slate-900 pt-1">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path>
+                                        <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+                                    </svg>
+                                </div>
+                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">YouTube Link:</strong> Accedi al video della live direttamente dal menu laterale.</p>
                             </div>
                         </div>
                     </div>
@@ -405,12 +354,14 @@
             <div id="emptyState" class="empty-state">
                 <div id="latestLiveBg"></div>
 
-                <div style="position: relative; width: 208px; height: 208px; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center;">
+                <div style="position: relative; width: 208px; height: 208px; margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center;">
                     <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); filter: blur(24px); opacity: 0.5; border-radius: 50%; animation: pulse 3s infinite;"></div>
                     <img id="emptyStateLogo" class="empty-logo-img" src="" alt="Scegli una live" style="position: relative; z-index: 10; width: 100%; height: 100%; object-fit: contain; margin: 0;">
                 </div>
                 
-                <h3 class="text-xl font-bold mt-4" style="position: relative; z-index: 10;">Nessuna Live Selezionata</h3>
+                <h1 class="text-4xl font-black tracking-tighter text-slate-900 mb-1" style="position: relative; z-index: 10; font-family: 'Inter', sans-serif;">NEWS</h1>
+
+                <h3 class="text-xl font-bold mt-10" style="position: relative; z-index: 10;">Nessuna Live Selezionata</h3>
                 <p class="text-slate-500 mt-2" style="position: relative; z-index: 10;">Apri il menu per scegliere cosa guardare.</p>
                 <button onclick="toggleSidebar()" class="mt-6 bg-slate-200 text-slate-800 px-6 py-3 rounded-xl font-bold" style="position: relative; z-index: 10;">Apri Menu</button>
             </div>
@@ -439,8 +390,16 @@
                 <button class="close-btn" onclick="closeModal()">✕</button>
                 <div class="modal-header-image" id="viewImage"></div>
                 <div class="modal-body">
-                    <div><span id="viewCategory">CATEGORIA</span><span id="viewBombs"></span></div>
-                    <h2 id="viewTitle">Titolo</h2>
+                    <div>
+                        <span id="viewCategory">CATEGORIA</span>
+                        <div id="viewStaticBombs" style="display:inline-flex; vertical-align: middle;"></div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 id="viewTitle" style="margin-bottom:0;">Titolo</h2>
+                        <div id="viewInteractiveBombs" class="card-bombs"></div>
+                    </div>
+
                     <div id="viewDesc"></div> 
                     <div id="viewImagesContainer"></div>
                     <div class="btn-group admin-only mt-8"><button class="btn btn-text" onclick="switchToEdit()">Modifica News</button></div>
@@ -499,26 +458,72 @@
         let cachedNews = []; 
         let allLives = []; 
         let isAdmin = false;
+        
+        // Mappa globale per tracciare lo stato delle bombe esplose per sessione
+        let explodedState = {};
 
         const ICON_MOON = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
         const ICON_SUN = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
         const ICON_LOCKED = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
         const ICON_UNLOCKED = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>`;
 
-        function getBombString(level) {
+        // Genera mattoncini statici (affidabilità) usando IMG
+        function getStaticBombs(level) {
             const n = parseInt(level) || 1;
             let html = '';
             for(let i=0; i<n; i++) {
-                html += `<div class="bomb-container" onclick="toggleBomb(event, this)"><span class="bomb-icon">💣</span><img src="boom.png" class="boom-img" alt="Boom"></div>`;
+                html += `<img src="brick.png" class="static-brick-img" alt="brick">`;
             }
             return html;
         }
+
+        // Genera i 3 mattoncini interattivi (BOOM) SINCRONIZZATI
+        function getInteractiveBombs(newsId) {
+            let html = '';
+            if (!explodedState[newsId]) explodedState[newsId] = [false, false, false];
+            
+            for(let i=0; i<3; i++) {
+                const isExploded = explodedState[newsId][i];
+                const explodedClass = isExploded ? 'exploded' : '';
+                
+                html += `<div class="bomb-container ${explodedClass}" onclick="toggleBomb(event, this, ${newsId}, ${i})">
+                            <img src="brick.png" class="bomb-icon-img" alt="Boom Brick">
+                            <img src="boom.png" class="boom-img" alt="Explosion">
+                         </div>`;
+            }
+            return html;
+        }
+
         function showLoader() { document.getElementById('loader').style.display = 'block'; }
         function hideLoader() { document.getElementById('loader').style.display = 'none'; }
 
-        function toggleBomb(e, el) {
+        // TOGGLE: Un click esplode, un altro click torna mattoncino
+        function toggleBomb(e, el, newsId, index) {
             e.stopPropagation();
-            el.classList.toggle('exploded');
+            
+            // Invertiamo lo stato (Toggle)
+            explodedState[newsId][index] = !explodedState[newsId][index];
+            const isExploded = explodedState[newsId][index];
+
+            // Aggiorna visivamente elemento cliccato subito
+            if(isExploded) el.classList.add('exploded');
+            else el.classList.remove('exploded');
+
+            // SINCRONIZZAZIONE
+            // 1. Se siamo nella lista, aggiorniamo il modal se è aperto
+            if (currentActiveNewsId === newsId) {
+                 const modalBombs = document.getElementById('viewInteractiveBombs');
+                 if(modalBombs) modalBombs.innerHTML = getInteractiveBombs(newsId);
+            }
+            
+            // 2. Se siamo nel modal, aggiorniamo la card nella griglia
+            const card = document.querySelector(`.card[data-id="${newsId}"]`);
+            if (card) {
+                const bombContainer = card.querySelector('.card-bombs');
+                if (bombContainer) {
+                    bombContainer.innerHTML = getInteractiveBombs(newsId);
+                }
+            }
         }
 
         async function checkSession() {
@@ -668,6 +673,18 @@
             }
         }
 
+        function getYoutubeId(url) {
+            if(!url) return null;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function openYoutube(e, url) {
+            e.stopPropagation();
+            if(url) window.open(url, '_blank');
+        }
+
         async function loadLives() {
             if(!sbClient) return;
             const { data: lives, error } = await sbClient.from('lives').select('*').order('live_date', { ascending: false });
@@ -675,18 +692,39 @@
             allLives = lives || [];
             const list = document.getElementById('liveList');
             list.innerHTML = '';
+            
             lives.forEach(live => {
                 const li = document.createElement('li');
                 li.className = `live-item ${live.id === activeLiveId ? 'active' : ''}`;
+                
+                let thumbHTML = '';
+                const ytId = getYoutubeId(live.youtube_link);
+                if(ytId) {
+                    const thumbUrl = `https://img.youtube.com/vi/${ytId}/mqdefault.jpg`;
+                    thumbHTML = `<div class="live-yt-thumb" onclick="openYoutube(event, '${live.youtube_link}')"><img src="${thumbUrl}"></div>`;
+                }
+
                 li.innerHTML = `
-                <div class="live-info">
-                    <span>${live.name}</span>
-                    <span class="live-date">${live.live_date || ''}</span>
+                <div class="live-item-content" onclick="selectLive({id: ${live.id}, name: '${live.name.replace(/'/g, "\\'")}'})">
+                    ${thumbHTML}
+                    <div class="live-info">
+                        <span class="live-name">${live.name}</span>
+                        <span class="live-date">${live.live_date || ''}</span>
+                    </div>
                 </div>
-                <div class="live-actions"><button class="action-btn" title="Rinomina" onclick="renameLive(event, ${live.id}, '${live.name}', '${live.live_date}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button><button class="action-btn delete-btn" title="Elimina" onclick="deleteLive(event, ${live.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div>`;
-                li.onclick = () => selectLive(live);
+                <div class="live-actions">
+                    <button class="action-btn admin-only" title="Modifica" onclick="renameLive(event, ${live.id}, '${live.name.replace(/'/g, "\\'")}', '${live.live_date}', '${live.youtube_link || ''}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    </button>
+                    <button class="action-btn delete-btn admin-only" title="Elimina" onclick="deleteLive(event, ${live.id})">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </button>
+                </div>`;
+                
                 list.appendChild(li);
             });
+            
+            checkSession(); 
             
             // Carica anteprima mosaico ultima live nel menu
             if(allLives.length > 0) {
@@ -696,7 +734,6 @@
         
         async function loadLatestLivePreview(liveId) {
             if(!sbClient || !liveId) return;
-            // Prende fino a 12 copertine per creare il mosaico
             const { data, error } = await sbClient
                 .from('news')
                 .select('cover_image')
@@ -706,7 +743,7 @@
                 
             const container = document.getElementById('latestLiveBg');
             if (container && !error && data && data.length > 0) {
-                container.innerHTML = ''; // Pulisce
+                container.innerHTML = ''; 
                 data.forEach(item => {
                     const img = document.createElement('img');
                     img.src = item.cover_image;
@@ -721,20 +758,22 @@
             const name = prompt("Nome Live:");
             if(!name) return;
             const dateStr = prompt("Data Live (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
+            const ytLink = prompt("Link YouTube (Opzionale):");
             
             showLoader();
-            const { error } = await sbClient.from('lives').insert([{ name: name, live_date: dateStr }]);
+            const { error } = await sbClient.from('lives').insert([{ name: name, live_date: dateStr, youtube_link: ytLink }]);
             if(!error) loadLives(); else { alert(error.message); hideLoader(); }
         }
 
-        async function renameLive(e, id, oldName, oldDate) {
+        async function renameLive(e, id, oldName, oldDate, oldLink) {
             e.stopPropagation(); if(!isAdmin) return;
             const newName = prompt("Nuovo nome Live:", oldName);
             const newDate = prompt("Nuova data Live (YYYY-MM-DD):", oldDate);
+            const newLink = prompt("Nuovo Link YouTube:", oldLink);
             
             if(newName && newDate) {
                 showLoader();
-                const { error } = await sbClient.from('lives').update({ name: newName, live_date: newDate }).eq('id', id);
+                const { error } = await sbClient.from('lives').update({ name: newName, live_date: newDate, youtube_link: newLink }).eq('id', id);
                 if(!error) loadLives(); else { alert(error.message); hideLoader(); }
             }
         }
@@ -755,15 +794,17 @@
                 hideLoader();
             }
         }
-        function selectLive(live, refreshList = true) {
+        function selectLive(live) {
             if(window.innerWidth < 1024) document.getElementById('sidebar').classList.add('collapsed');
 
             activeLiveId = live.id;
             document.querySelectorAll('.live-item').forEach(el => el.classList.remove('active'));
+            // Refresh visivo semplice
             const items = document.querySelectorAll('.live-item');
             items.forEach(i => {
                 if(i.innerText.includes(live.name)) i.classList.add('active');
             });
+            
             document.getElementById('emptyState').style.display = 'none';
             document.getElementById('mainHeader').style.display = 'flex';
             document.getElementById('headerTitle').innerText = live.name;
@@ -839,10 +880,10 @@
             filtered.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'card';
+                card.dataset.id = item.id; 
                 if (isAdmin && !item.is_online) card.classList.add('offline-mode');
                 
                 if(isAdmin) card.draggable = true; 
-                card.dataset.id = item.id;
                 
                 if(isAdmin) {
                     card.addEventListener('dragstart', handleDragStart);
@@ -885,9 +926,12 @@
                     </div>
                     <div class="card-content">
                         <div class="card-meta-row">
-                            <span class="card-category">${item.category}</span>
+                            <div style="display:flex; align-items:center;">
+                                <span class="card-category">${item.category}</span>
+                                ${getStaticBombs(item.likelihood)}
+                            </div>
                             <div class="card-bombs">
-                                ${getBombString(item.likelihood)}
+                                ${getInteractiveBombs(item.id)}
                             </div>
                         </div>
                         <h3 class="card-title">${titleHtml}</h3>
@@ -906,7 +950,10 @@
             
             document.getElementById('viewTitle').innerText = partialItem.title;
             document.getElementById('viewCategory').innerText = partialItem.category;
-            document.getElementById('viewBombs').innerText = "💣".repeat(parseInt(partialItem.likelihood) || 1);
+            // Nel modal mostriamo la reliability statica
+            document.getElementById('viewStaticBombs').innerHTML = getStaticBombs(partialItem.likelihood);
+            // E anche le bombe interattive
+            document.getElementById('viewInteractiveBombs').innerHTML = getInteractiveBombs(partialItem.id);
             
             const viewImg = document.getElementById('viewImage');
             viewImg.style.backgroundImage = partialItem.cover_image ? `url('${partialItem.cover_image}')` : 'none';
