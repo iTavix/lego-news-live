@@ -20,6 +20,7 @@
             --accent: #007AFF;
             --danger: #FF3B30;
             --success: #34C759;
+            --gold: #FFD60A; /* Colore Coppa */
             --radius: 24px; 
             --font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             --sidebar-width: 320px;
@@ -39,6 +40,56 @@
         .admin-only { display: none !important; }
         body.is-admin .admin-only { display: flex !important; }
 
+        /* --- STILI COPPA (VOTO) --- */
+        .trophy-container {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px; margin-left: auto; cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 20; pointer-events: auto;
+        }
+        .trophy-icon {
+            width: 22px; height: 22px; fill: none; stroke: var(--text-sec);
+            stroke-width: 2; transition: all 0.3s ease; opacity: 0.6;
+        }
+        /* Stato Attivo (Votato) */
+        .trophy-container.voted .trophy-icon {
+            fill: var(--gold); stroke: var(--gold); opacity: 1;
+            filter: drop-shadow(0 0 8px rgba(255, 214, 10, 0.5));
+            animation: trophyPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .trophy-container:hover { transform: scale(1.15); }
+        .trophy-container:active { transform: scale(0.9); }
+        @keyframes trophyPop {
+            0% { transform: scale(0.8); }
+            50% { transform: scale(1.4) rotate(-10deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        /* --- LISTA CLASSIFICA (HALL OF FAME) --- */
+        .ranking-list { list-style: none; padding: 0; margin: 0; }
+        .ranking-item { 
+            display: flex; align-items: center; gap: 15px; padding: 15px; 
+            background: var(--bg-input); border-radius: 20px; margin-bottom: 12px;
+        }
+        .ranking-pos { 
+            font-size: 24px; font-weight: 900; color: var(--text-sec); width: 30px; text-align: center; 
+        }
+        .ranking-item:nth-child(1) .ranking-pos { color: #FFD700; } /* Oro */
+        .ranking-item:nth-child(2) .ranking-pos { color: #C0C0C0; } /* Argento */
+        .ranking-item:nth-child(3) .ranking-pos { color: #CD7F32; } /* Bronzo */
+        
+        .ranking-thumb { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; background-color: #ccc; }
+        .ranking-info { flex: 1; overflow: hidden; }
+        .ranking-title { font-weight: 700; font-size: 16px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); }
+        .ranking-live { font-size: 12px; color: var(--text-sec); }
+        .ranking-votes { 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: var(--bg-card); padding: 8px 12px; border-radius: 12px; min-width: 60px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .vote-number { font-size: 18px; font-weight: 800; color: var(--text-main); }
+        .vote-label { font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--text-sec); }
+
         /* --- TOGGLE APPLE --- */
         .admin-toggle-container {
             position: absolute; top: 10px; right: 10px; z-index: 50;
@@ -57,18 +108,11 @@
 
         /* --- ANIMAZIONE BOOM --- */
         .bomb-container { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; cursor: pointer; margin-right: 2px; position: relative; pointer-events: auto; }
-        
-        /* Stile per l'icona brick.png interattiva (USATA ANCHE IN LANDING) */
         .bomb-icon-img { width: 22px; height: 22px; object-fit: contain; transition: transform 0.2s; display: block; }
         .boom-img { width: 30px; height: 30px; display: none; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        
-        /* Gestione stato esploso */
         .bomb-container.exploded .bomb-icon-img { display: none; }
         .bomb-container.exploded .boom-img { display: block; }
-        
         @keyframes popIn { 0% { transform: scale(0) rotate(-45deg); opacity: 0; } 60% { transform: scale(1.3) rotate(10deg); opacity: 1; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
-
-        /* Stile per brick.png statici (affidabilità) */
         .static-brick-img { display: inline-block; width: 16px; height: 16px; margin-right: 3px; object-fit: contain; vertical-align: middle; }
         
         /* --- LANDING --- */
@@ -115,6 +159,9 @@
         .icon-btn { background: var(--bg-card); border: 1px solid transparent; box-shadow: 0 2px 6px rgba(0,0,0,0.05); border-radius: 50%; width: 44px; height: 44px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-main); font-size: 20px; transition: 0.2s; }
         .icon-btn:hover { transform: scale(1.05); }
         .icon-btn svg { display: block; }
+        /* Badge per il tasto Hall of Fame */
+        .icon-btn.gold-btn { color: #FFD60A; background: var(--bg-card); border-color: rgba(255, 214, 10, 0.3); }
+        .icon-btn.gold-btn:hover { background: rgba(255, 214, 10, 0.1); }
 
         /* --- HEADER LIVE --- */
         .main-header { display: flex; flex-direction: column; align-items: flex-start; gap: 15px; margin-bottom: 50px; width: 100%; text-align: left; }
@@ -271,6 +318,14 @@
                                 </div>
                                 <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Divertiti con noi:</strong> fai scoppiare i mattoncini nelle news ed assegna il tuo personale valore alle News.</p>
                             </div>
+                            
+                            <div class="flex gap-3 items-start">
+                                <div class="text-slate-900 pt-1">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+                                </div>
+                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Best News:</strong> Clicca sulla coppa nella scheda per votare la tua notizia preferita della puntata.</p>
+                            </div>
+
                             <div class="flex gap-3 items-start">
                                 <div class="text-slate-900 pt-1">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -339,6 +394,11 @@
             <div class="top-bar-controls">
                 <button class="icon-btn" onclick="toggleSidebar()" title="Menu"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
                 <button class="icon-btn" onclick="toggleDarkMode()" title="Dark Mode"><span id="darkModeIcon" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;"></span></button>
+                
+                <button class="icon-btn gold-btn" onclick="openBestNewsModal()" title="Classifica Migliori News">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+                </button>
+                
                 <button class="icon-btn" onclick="toggleLogin()" title="Admin Login" style="margin-left: auto;"><span id="authIcon" style="display: flex; align-items: center; justify-content: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span></button>
             </div>
             <header class="main-header" id="mainHeader" style="display:none;">
@@ -353,14 +413,11 @@
             </header>
             <div id="emptyState" class="empty-state">
                 <div id="latestLiveBg"></div>
-
                 <div style="position: relative; width: 208px; height: 208px; margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center;">
                     <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); filter: blur(24px); opacity: 0.5; border-radius: 50%; animation: pulse 3s infinite;"></div>
                     <img id="emptyStateLogo" class="empty-logo-img" src="" alt="Scegli una live" style="position: relative; z-index: 10; width: 100%; height: 100%; object-fit: contain; margin: 0;">
                 </div>
-                
                 <h1 class="text-4xl font-black tracking-tighter text-slate-900 mb-1" style="position: relative; z-index: 10; font-family: 'Inter', sans-serif;">NEWS</h1>
-
                 <h3 class="text-xl font-bold mt-10" style="position: relative; z-index: 10;">Nessuna Live Selezionata</h3>
                 <p class="text-slate-500 mt-2" style="position: relative; z-index: 10;">Apri il menu per scegliere cosa guardare.</p>
                 <button onclick="toggleSidebar()" class="mt-6 bg-slate-200 text-slate-800 px-6 py-3 rounded-xl font-bold" style="position: relative; z-index: 10;">Apri Menu</button>
@@ -380,6 +437,23 @@
                     <div id="loginError" class="text-red-500 text-sm hidden bg-red-50 p-3 rounded-lg border border-red-100"></div>
                     <button type="submit" class="btn btn-primary">Accedi</button>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="bestNewsModal">
+        <div class="modal-card" style="width: 100%; max-width: 600px; height: 80vh;">
+            <div class="modal-scrollable">
+                <button class="close-btn" onclick="closeBestNewsModal()">✕</button>
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="width: 60px; height: 60px; background: rgba(255, 214, 10, 0.1); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 10px; color: #FFD60A;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+                    </div>
+                    <h2 style="margin: 0; font-size: 28px; font-weight: 800;">Hall of Fame</h2>
+                    <p style="color: var(--text-sec); margin-top: 5px;">Le News più votate dalla community</p>
+                </div>
+                <div id="bestNewsListContainer">
+                    </div>
             </div>
         </div>
     </div>
@@ -459,7 +533,6 @@
         let allLives = []; 
         let isAdmin = false;
         
-        // Mappa globale per tracciare lo stato delle bombe esplose per sessione
         let explodedState = {};
 
         const ICON_MOON = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
@@ -467,7 +540,6 @@
         const ICON_LOCKED = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
         const ICON_UNLOCKED = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>`;
 
-        // Genera mattoncini statici (affidabilità) usando IMG
         function getStaticBombs(level) {
             const n = parseInt(level) || 1;
             let html = '';
@@ -477,15 +549,12 @@
             return html;
         }
 
-        // Genera i 3 mattoncini interattivi (BOOM) SINCRONIZZATI
         function getInteractiveBombs(newsId) {
             let html = '';
             if (!explodedState[newsId]) explodedState[newsId] = [false, false, false];
-            
             for(let i=0; i<3; i++) {
                 const isExploded = explodedState[newsId][i];
                 const explodedClass = isExploded ? 'exploded' : '';
-                
                 html += `<div class="bomb-container ${explodedClass}" onclick="toggleBomb(event, this, ${newsId}, ${i})">
                             <img src="brick.png" class="bomb-icon-img" alt="Boom Brick">
                             <img src="boom.png" class="boom-img" alt="Explosion">
@@ -497,32 +566,19 @@
         function showLoader() { document.getElementById('loader').style.display = 'block'; }
         function hideLoader() { document.getElementById('loader').style.display = 'none'; }
 
-        // TOGGLE: Un click esplode, un altro click torna mattoncino
         function toggleBomb(e, el, newsId, index) {
             e.stopPropagation();
-            
-            // Invertiamo lo stato (Toggle)
             explodedState[newsId][index] = !explodedState[newsId][index];
             const isExploded = explodedState[newsId][index];
-
-            // Aggiorna visivamente elemento cliccato subito
-            if(isExploded) el.classList.add('exploded');
-            else el.classList.remove('exploded');
-
-            // SINCRONIZZAZIONE
-            // 1. Se siamo nella lista, aggiorniamo il modal se è aperto
+            if(isExploded) el.classList.add('exploded'); else el.classList.remove('exploded');
             if (currentActiveNewsId === newsId) {
                  const modalBombs = document.getElementById('viewInteractiveBombs');
                  if(modalBombs) modalBombs.innerHTML = getInteractiveBombs(newsId);
             }
-            
-            // 2. Se siamo nel modal, aggiorniamo la card nella griglia
             const card = document.querySelector(`.card[data-id="${newsId}"]`);
             if (card) {
                 const bombContainer = card.querySelector('.card-bombs');
-                if (bombContainer) {
-                    bombContainer.innerHTML = getInteractiveBombs(newsId);
-                }
+                if (bombContainer) bombContainer.innerHTML = getInteractiveBombs(newsId);
             }
         }
 
@@ -530,47 +586,25 @@
             if(!sbClient) return;
             try {
                 const { data, error } = await sbClient.auth.getSession();
-                if (error) {
-                    if(error.message.includes("Refresh Token")) {
-                        console.warn("Token expired, logging out...");
-                        await sbClient.auth.signOut();
-                    }
-                    updateAuthUI(null);
-                } else {
-                    updateAuthUI(data.session);
-                }
-                
+                if (error) { updateAuthUI(null); } else { updateAuthUI(data.session); }
                 sbClient.auth.onAuthStateChange((event, session) => {
-                    if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
-                        updateAuthUI(null);
-                    } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-                        updateAuthUI(session);
-                    }
+                    if (event === 'SIGNED_OUT' || event === 'USER_DELETED') updateAuthUI(null);
+                    else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') updateAuthUI(session);
                 });
-            } catch (err) {
-                console.error("Auth check failed:", err);
-                updateAuthUI(null);
-            }
+            } catch (err) { updateAuthUI(null); }
         }
 
         function updateAuthUI(session) {
             isAdmin = !!session;
             const authIcon = document.getElementById('authIcon');
-            if (isAdmin) {
-                document.body.classList.add('is-admin');
-                authIcon.innerHTML = ICON_UNLOCKED; 
-            } else {
-                document.body.classList.remove('is-admin');
-                authIcon.innerHTML = ICON_LOCKED;
-            }
+            if (isAdmin) { document.body.classList.add('is-admin'); authIcon.innerHTML = ICON_UNLOCKED; } 
+            else { document.body.classList.remove('is-admin'); authIcon.innerHTML = ICON_LOCKED; }
             if(activeLiveId) refreshUI();
         }
 
         function toggleLogin() {
             if (isAdmin) {
-                if(confirm("Logout?")) {
-                    if(sbClient) sbClient.auth.signOut().then(() => updateAuthUI(null));
-                }
+                if(confirm("Logout?")) { if(sbClient) sbClient.auth.signOut(); }
             } else {
                 document.getElementById('loginError').classList.add('hidden');
                 document.getElementById('loginModal').classList.add('active');
@@ -582,38 +616,19 @@
             if(!sbClient) return alert("Database Disconnesso");
             const email = document.getElementById('loginEmail').value;
             const pass = document.getElementById('loginPass').value;
-            const errorDiv = document.getElementById('loginError');
-            errorDiv.classList.add('hidden');
-
-            const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-            if (!strongPasswordRegex.test(pass)) {
-                errorDiv.innerText = "Password debole: Min 8 caratteri, maiuscola, minuscola, numero.";
-                errorDiv.classList.remove('hidden');
-                return;
-            }
-
             const { data, error } = await sbClient.auth.signInWithPassword({ email, password: pass });
             if (error) {
-                errorDiv.innerText = "Errore: " + error.message;
-                errorDiv.classList.remove('hidden');
-            } else {
-                updateAuthUI(data.session);
-                closeLoginModal();
-                document.getElementById('loginEmail').value = '';
-                document.getElementById('loginPass').value = '';
-            }
+                const errorDiv = document.getElementById('loginError');
+                errorDiv.innerText = "Errore: " + error.message; errorDiv.classList.remove('hidden');
+            } else { closeLoginModal(); }
         }
         function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
 
         function initTheme() {
             const savedTheme = localStorage.getItem('theme');
             const iconContainer = document.getElementById('darkModeIcon');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-mode');
-                iconContainer.innerHTML = ICON_SUN;
-            } else {
-                iconContainer.innerHTML = ICON_MOON;
-            }
+            if (savedTheme === 'dark') { document.body.classList.add('dark-mode'); iconContainer.innerHTML = ICON_SUN; } 
+            else { iconContainer.innerHTML = ICON_MOON; }
             updateDynamicImages();
         }
 
@@ -653,24 +668,13 @@
                 app.style.display = 'flex';
                 setTimeout(() => app.classList.add('visible'), 50);
                 selectLive(allLives[0]);
-                if(window.innerWidth < 1024) {
-                    document.getElementById('sidebar').classList.add('collapsed');
-                } else {
-                    document.getElementById('sidebar').classList.remove('collapsed');
-                }
-            } else {
-                enterApp();
-            }
+                if(window.innerWidth >= 1024) document.getElementById('sidebar').classList.remove('collapsed');
+            } else { enterApp(); }
         }
 
         async function initApp() { 
             initTheme(); 
-            if(sbClient) {
-                checkSession();
-                loadLives(); 
-            } else {
-                console.warn("Offline Mode");
-            }
+            if(sbClient) { checkSession(); loadLives(); } else { console.warn("Offline Mode"); }
         }
 
         function getYoutubeId(url) {
@@ -679,11 +683,7 @@
             const match = url.match(regExp);
             return (match && match[2].length === 11) ? match[2] : null;
         }
-
-        function openYoutube(e, url) {
-            e.stopPropagation();
-            if(url) window.open(url, '_blank');
-        }
+        function openYoutube(e, url) { e.stopPropagation(); if(url) window.open(url, '_blank'); }
 
         async function loadLives() {
             if(!sbClient) return;
@@ -720,35 +720,18 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                     </button>
                 </div>`;
-                
                 list.appendChild(li);
             });
-            
-            checkSession(); 
-            
-            // Carica anteprima mosaico ultima live nel menu
-            if(allLives.length > 0) {
-                loadLatestLivePreview(allLives[0].id);
-            }
+            if(allLives.length > 0) loadLatestLivePreview(allLives[0].id);
         }
         
         async function loadLatestLivePreview(liveId) {
             if(!sbClient || !liveId) return;
-            const { data, error } = await sbClient
-                .from('news')
-                .select('cover_image')
-                .eq('live_id', liveId)
-                .not('cover_image', 'is', null)
-                .limit(12);
-                
+            const { data, error } = await sbClient.from('news').select('cover_image').eq('live_id', liveId).not('cover_image', 'is', null).limit(12);
             const container = document.getElementById('latestLiveBg');
             if (container && !error && data && data.length > 0) {
                 container.innerHTML = ''; 
-                data.forEach(item => {
-                    const img = document.createElement('img');
-                    img.src = item.cover_image;
-                    container.appendChild(img);
-                });
+                data.forEach(item => { const img = document.createElement('img'); img.src = item.cover_image; container.appendChild(img); });
                 container.style.opacity = '1'; 
             }
         }
@@ -759,7 +742,6 @@
             if(!name) return;
             const dateStr = prompt("Data Live (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
             const ytLink = prompt("Link YouTube (Opzionale):");
-            
             showLoader();
             const { error } = await sbClient.from('lives').insert([{ name: name, live_date: dateStr, youtube_link: ytLink }]);
             if(!error) loadLives(); else { alert(error.message); hideLoader(); }
@@ -770,7 +752,6 @@
             const newName = prompt("Nuovo nome Live:", oldName);
             const newDate = prompt("Nuova data Live (YYYY-MM-DD):", oldDate);
             const newLink = prompt("Nuovo Link YouTube:", oldLink);
-            
             if(newName && newDate) {
                 showLoader();
                 const { error } = await sbClient.from('lives').update({ name: newName, live_date: newDate, youtube_link: newLink }).eq('id', id);
@@ -796,15 +777,10 @@
         }
         function selectLive(live) {
             if(window.innerWidth < 1024) document.getElementById('sidebar').classList.add('collapsed');
-
             activeLiveId = live.id;
             document.querySelectorAll('.live-item').forEach(el => el.classList.remove('active'));
-            // Refresh visivo semplice
             const items = document.querySelectorAll('.live-item');
-            items.forEach(i => {
-                if(i.innerText.includes(live.name)) i.classList.add('active');
-            });
-            
+            items.forEach(i => { if(i.innerText.includes(live.name)) i.classList.add('active'); });
             document.getElementById('emptyState').style.display = 'none';
             document.getElementById('mainHeader').style.display = 'flex';
             document.getElementById('headerTitle').innerText = live.name;
@@ -816,7 +792,7 @@
             showLoader();
             const { data: news, error } = await sbClient
                 .from('news')
-                .select('id, live_id, title, category, likelihood, cover_image, description, order, is_online')
+                .select('id, live_id, title, category, likelihood, cover_image, description, order, is_online, votes')
                 .eq('live_id', liveId)
                 .order('order', { ascending: true });
             if (error) { alert(error.message); hideLoader(); return; }
@@ -831,11 +807,7 @@
             if (newsItem) newsItem.is_online = newStatus;
             refreshUI(); 
             const { error } = await sbClient.from('news').update({ is_online: newStatus }).eq('id', id);
-            if (error) {
-                alert("Errore aggiornamento: " + error.message);
-                if (newsItem) newsItem.is_online = !newStatus;
-                refreshUI();
-            }
+            if (error) { alert("Errore aggiornamento"); if (newsItem) newsItem.is_online = !newStatus; refreshUI(); }
         }
 
         function refreshUI() {
@@ -882,9 +854,7 @@
                 card.className = 'card';
                 card.dataset.id = item.id; 
                 if (isAdmin && !item.is_online) card.classList.add('offline-mode');
-                
                 if(isAdmin) card.draggable = true; 
-                
                 if(isAdmin) {
                     card.addEventListener('dragstart', handleDragStart);
                     card.addEventListener('dragover', handleDragOver);
@@ -892,30 +862,26 @@
                     card.addEventListener('dragend', handleDragEnd);
                 }
                 card.onclick = (e) => { 
-                    if(e.target.closest('.admin-toggle-container') || e.target.closest('.bomb-container') || card.classList.contains('dragging')) return;
+                    if(e.target.closest('.admin-toggle-container') || e.target.closest('.bomb-container') || e.target.closest('.trophy-container') || card.classList.contains('dragging')) return;
                     openViewModal(item); 
                 }; 
                 
                 let toggleHTML = '';
                 if (isAdmin) {
-                    toggleHTML = `
-                        <div class="admin-toggle-container" onclick="event.stopPropagation()">
+                    toggleHTML = `<div class="admin-toggle-container" onclick="event.stopPropagation()">
                             <span class="toggle-status-label">${item.is_online ? 'ON' : 'OFF'}</span>
-                            <label class="apple-switch">
-                                <input type="checkbox" ${item.is_online ? 'checked' : ''} onchange="toggleNewsStatus(${item.id}, this.checked)">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    `;
+                            <label class="apple-switch"><input type="checkbox" ${item.is_online ? 'checked' : ''} onchange="toggleNewsStatus(${item.id}, this.checked)"><span class="slider"></span></label>
+                        </div>`;
                 }
 
-                // Logica Tipografia: Prima parola Nera, resto Grigio
+                // Check se votato
+                const hasVoted = localStorage.getItem(`vote_${item.id}`) === 'true';
+                const voteClass = hasVoted ? 'voted' : '';
+
                 const titleParts = item.title.split(' ');
                 const firstWord = titleParts[0] || '';
                 const restOfTitle = titleParts.slice(1).join(' ');
-                
                 const titleHtml = `<span style="color: var(--text-main); font-weight: 800;">${firstWord}</span> <span style="color: var(--text-sec); font-weight: 500;">${restOfTitle}</span>`;
-
                 const bg = item.cover_image ? item.cover_image : '';
                 
                 card.innerHTML = `
@@ -930,9 +896,14 @@
                                 <span class="card-category">${item.category}</span>
                                 ${getStaticBombs(item.likelihood)}
                             </div>
-                            <div class="card-bombs">
-                                ${getInteractiveBombs(item.id)}
+                            <div class="trophy-container ${voteClass}" onclick="toggleBestNews(event, ${item.id}, this)">
+                                <svg class="trophy-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+                                </svg>
                             </div>
+                        </div>
+                        <div class="card-meta-row" style="margin-top: -5px; margin-bottom: 8px;">
+                             <div class="card-bombs">${getInteractiveBombs(item.id)}</div>
                         </div>
                         <h3 class="card-title">${titleHtml}</h3>
                     </div>
@@ -944,22 +915,88 @@
         
         function filterNews(cat) { currentFilter = cat; refreshUI(); }
 
-        // --- APERTURA IBRIDA ---
+        // --- BEST NEWS LOGIC ---
+        async function toggleBestNews(e, newsId, el) {
+            e.stopPropagation();
+            const storageKey = `vote_${newsId}`;
+            const isVoted = localStorage.getItem(storageKey) === 'true';
+            
+            if (!isVoted) {
+                el.classList.add('voted');
+                localStorage.setItem(storageKey, 'true');
+            } else {
+                el.classList.remove('voted');
+                localStorage.removeItem(storageKey);
+            }
+
+            if(!sbClient) return;
+            // Optimistic update su DB (lettura + scrittura)
+            const { data, error } = await sbClient.from('news').select('votes').eq('id', newsId).single();
+            if(!error) {
+                const current = data.votes || 0;
+                const next = isVoted ? Math.max(0, current - 1) : current + 1;
+                await sbClient.from('news').update({ votes: next }).eq('id', newsId);
+            }
+        }
+
+        async function openBestNewsModal() {
+            if(!sbClient) return;
+            showLoader();
+            // Fetch top 50 news ordinate per voti
+            const { data: bestNews, error } = await sbClient
+                .from('news')
+                .select('id, title, cover_image, votes, live_id')
+                .gt('votes', 0)
+                .order('votes', { ascending: false })
+                .limit(50);
+            
+            hideLoader();
+            if(error) return alert("Errore caricamento classifica");
+
+            const container = document.getElementById('bestNewsListContainer');
+            if(!bestNews || bestNews.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-sec);">Nessuna news votata ancora!</div>';
+            } else {
+                // Recuperiamo info live per mostrare il nome live
+                const liveMap = {};
+                if(allLives.length > 0) allLives.forEach(l => liveMap[l.id] = l.name);
+
+                let html = '<ul class="ranking-list">';
+                bestNews.forEach((news, index) => {
+                   const liveName = liveMap[news.live_id] || 'Live passata';
+                   const thumb = news.cover_image || 'brick.png';
+                   html += `
+                    <li class="ranking-item">
+                        <div class="ranking-pos">${index + 1}</div>
+                        <img src="${thumb}" class="ranking-thumb" alt="thumb">
+                        <div class="ranking-info">
+                            <div class="ranking-title">${news.title}</div>
+                            <div class="ranking-live">${liveName}</div>
+                        </div>
+                        <div class="ranking-votes">
+                            <span class="vote-number">${news.votes}</span>
+                            <span class="vote-label">Voti</span>
+                        </div>
+                    </li>`;
+                });
+                html += '</ul>';
+                container.innerHTML = html;
+            }
+            document.getElementById('bestNewsModal').classList.add('active');
+        }
+        function closeBestNewsModal() { document.getElementById('bestNewsModal').classList.remove('active'); }
+
+
         async function openViewModal(partialItem) {
             currentActiveNewsId = partialItem.id;
-            
             document.getElementById('viewTitle').innerText = partialItem.title;
             document.getElementById('viewCategory').innerText = partialItem.category;
-            // Nel modal mostriamo la reliability statica
             document.getElementById('viewStaticBombs').innerHTML = getStaticBombs(partialItem.likelihood);
-            // E anche le bombe interattive
             document.getElementById('viewInteractiveBombs').innerHTML = getInteractiveBombs(partialItem.id);
-            
             const viewImg = document.getElementById('viewImage');
             viewImg.style.backgroundImage = partialItem.cover_image ? `url('${partialItem.cover_image}')` : 'none';
             if(!partialItem.cover_image) viewImg.style.backgroundColor = '#eee';
             
-            // Testo immediato
             const cleanText = formatDescriptionTextOnly(partialItem.description);
             document.getElementById('viewDesc').innerHTML = cleanText;
             document.getElementById('viewImagesContainer').innerHTML = ''; 
@@ -968,15 +1005,11 @@
             document.getElementById('editMode').classList.add('hidden');
             document.getElementById('modalOverlay').classList.add('active');
             
-            // Carica solo galleria in background
             const { data: fullItem, error } = await sbClient.from('news').select('body_images').eq('id', partialItem.id).single();
-            
             if (!error && fullItem) {
                 currentViewImages = fullItem.body_images || [];
                 if (currentViewImages.length > 0) {
-                    setTimeout(() => {
-                        document.getElementById('viewImagesContainer').innerHTML = createGalleryButton(currentViewImages.length);
-                    }, 100); 
+                    setTimeout(() => { document.getElementById('viewImagesContainer').innerHTML = createGalleryButton(currentViewImages.length); }, 100); 
                 }
             }
         }
@@ -989,13 +1022,9 @@
         }
 
         function createGalleryButton(count) {
-            return `
-            <div class="image-attachment-pill" onclick="openLightbox(0)">
-                <div class="icon-box">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                </div>
-                <span>Visualizza Galleria (${count} foto)</span>
-            </div>`;
+            return `<div class="image-attachment-pill" onclick="openLightbox(0)">
+                <div class="icon-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
+                <span>Visualizza Galleria (${count} foto)</span></div>`;
         }
 
         async function openEditModal(id = null) {
