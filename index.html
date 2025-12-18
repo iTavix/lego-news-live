@@ -253,7 +253,7 @@
         }
         #latestLiveBg img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* --- GRIGLIA NEWS (CARD STANDARD) --- */
+        /* --- GRIGLIA NEWS (CARD STANDARD - PER ADMIN) --- */
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; width: 100%; }
         @media (max-width: 640px) { .grid-container { grid-template-columns: 1fr; } }
         @media (min-width: 641px) and (max-width: 1024px) { .grid-container { grid-template-columns: repeat(2, 1fr); } }
@@ -297,7 +297,7 @@
         .card-title { font-size: 20px; font-weight: 700; margin: 0; line-height: 1.35; color: var(--text-main); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; letter-spacing: -0.3px; }
 
 
-        /* --- VISTA BLOG (ORIZZONTALE) --- */
+        /* --- VISTA BLOG (ORIZZONTALE - PER TUTTI GLI ALTRI) --- */
         .blog-container { display: flex; flex-direction: column; gap: 24px; max-width: 800px; margin: 0 auto; padding-bottom: 40px; }
         .blog-card {
             display: flex; gap: 24px;
@@ -422,12 +422,10 @@
                                 <div><img src="brick.png" class="bomb-icon-img" alt="brick"></div>
                                 <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Divertiti con noi:</strong> fai scoppiare i mattoncini nelle news ed assegna il tuo personale valore di "BOOM".</p>
                             </div>
-                            
                             <div class="flex gap-3 items-start">
                                 <div class="text-slate-900"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg></div>
                                 <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Hall of Fame:</strong> Vota le migliori news e scopri la classifica.</p>
                             </div>
-
                             <div class="flex gap-3 items-start">
                                 <div class="text-slate-900">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -994,13 +992,12 @@
                 card.dataset.id = item.id; 
                 if (isAdmin && !item.is_online) card.classList.add('offline-mode');
                 
-                if(canEditContent) {
-                    card.draggable = true; 
-                    card.addEventListener('dragstart', handleDragStart);
-                    card.addEventListener('dragover', handleDragOver);
-                    card.addEventListener('drop', handleDrop);
-                    card.addEventListener('dragend', handleDragEnd);
-                }
+                // DRAG & DROP PER TUTTI
+                card.draggable = true; 
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragover', handleDragOver);
+                card.addEventListener('drop', handleDrop);
+                card.addEventListener('dragend', handleDragEnd);
                 
                 card.onclick = (e) => { 
                     if(e.target.closest('.admin-toggle-container') || e.target.closest('.bomb-container') || e.target.closest('.trophy-container') || card.classList.contains('dragging')) return;
@@ -1070,6 +1067,13 @@
                 const card = document.createElement('div');
                 card.className = 'blog-card';
                 card.dataset.id = item.id;
+                
+                // DRAG & DROP PER TUTTI
+                card.draggable = true; 
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragover', handleDragOver);
+                card.addEventListener('drop', handleDrop);
+                card.addEventListener('dragend', handleDragEnd);
                 
                 card.onclick = (e) => { 
                     if(e.target.closest('.admin-toggle-container') || e.target.closest('.bomb-container') || e.target.closest('.trophy-container')) return;
@@ -1286,6 +1290,7 @@
 
         async function openEditModal(id = null) {
             if(!isAdmin) return;
+            // Doppio controllo permesso (nel caso chiamino la funzione da console)
             if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') return alert("Non hai i permessi per modificare News.");
 
             tempCoverImage = ''; tempBodyImages = [];
@@ -1331,6 +1336,8 @@
 
         async function saveNews() {
             if(!activeLiveId || !isAdmin) return;
+            
+            // Controllo permessi salvataggio
             if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') return alert("Permesso negato");
 
             const idInput = document.getElementById('editId').value;
