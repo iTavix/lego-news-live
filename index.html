@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEGO News Live 2PPL</title>
+    <title>LEGO News & Ideas Live 2PPL</title>
     <link rel="icon" href="LOGO-fondo BIANCO-2026.png" type="image/png">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -158,11 +158,15 @@
 
         .sidebar { width: var(--sidebar-width); background-color: var(--bg-sidebar); border-right: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; padding: 20px 15px; padding-top: max(20px, env(safe-area-inset-top)); flex-shrink: 0; transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); overflow: hidden; white-space: nowrap; z-index: 100; }
         .sidebar.collapsed { width: 0; padding: 0; opacity: 0; border: none; }
-        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 5px; }
-        .sidebar-title { font-size: 20px; font-weight: 700; margin: 0; color: var(--text-main); }
+        
+        /* CLASSE PER BLOCCARE SCROLL SIDEBAR */
+        .sidebar.locked { overflow-y: hidden !important; }
+
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 0 5px; }
+        .sidebar-title { font-size: 18px; font-weight: 700; margin: 0; color: var(--text-main); }
         .add-live-btn { background: none; border: none; color: var(--accent); font-size: 24px; cursor: pointer; padding: 0; }
         
-        .live-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; flex: 1; }
+        .live-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; max-height: 40%; margin-bottom: 20px; }
         .live-item { padding: 12px 10px; margin-bottom: 6px; border-radius: 12px; cursor: pointer; font-size: 15px; font-weight: 500; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; color: var(--text-main); }
         .live-item:hover { background-color: rgba(0,0,0,0.05); }
         .live-item.active { background-color: var(--bg-input); font-weight: 600; color: var(--accent); }
@@ -214,7 +218,23 @@
         .btn-add-news { background-color: var(--text-main); color: var(--bg-body); border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s; margin-left: auto; }
         .btn-add-news:hover { transform: scale(1.05); }
 
-        .nav-pills { display: flex; background: rgba(120,120,128,0.12); padding: 4px; border-radius: 12px; gap: 0; flex-wrap: wrap; width: fit-content; margin-top: 15px; backdrop-filter: blur(10px); }
+        /* STICKY FILTER CONTAINER (MODIFICATO: Fuori dall'header) */
+        .sticky-filter-container {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background-color: rgba(245, 245, 247, 0.90); /* Colore sfondo body con alpha */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            width: 100%;
+            padding: 10px 0 15px 0;
+            margin-bottom: 20px;
+        }
+        body.dark-mode .sticky-filter-container {
+            background-color: rgba(0, 0, 0, 0.85);
+        }
+
+        .nav-pills { display: flex; background: rgba(120,120,128,0.12); padding: 4px; border-radius: 12px; gap: 0; flex-wrap: wrap; width: fit-content; }
         .nav-item { padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--text-main); transition: 0.2s; white-space: nowrap; margin: 0 2px; }
         .nav-item:hover { opacity: 0.7; }
         .nav-item.active { background-color: var(--bg-card); color: var(--text-main); box-shadow: 0 3px 8px rgba(0,0,0,0.12); font-weight: 700; }
@@ -377,7 +397,7 @@
         @media (max-width: 1024px) {
             .sidebar { position: fixed; top: 0; left: 0; height: 100%; width: 100%; z-index: 200; transform: translateX(0); border-right: none; padding-top: calc(env(safe-area-inset-top) + 80px); background-color: var(--bg-body); }
             .sidebar.collapsed { transform: translateX(-100%); width: 100%; opacity: 0; }
-            .sidebar-header { justify-content: center; margin-bottom: 30px; }
+            .sidebar-header { justify-content: space-between; margin-bottom: 10px; }
             .header-logo { height: 40px; }
             .modal-card { height: 100%; max-height: 100%; border-radius: 0; }
             .modal-header-image { height: 250px; border-radius: 16px; margin-bottom: 15px; } 
@@ -399,8 +419,8 @@
         <main class="w-full min-h-full flex flex-col justify-center max-w-7xl mx-auto px-4 py-10 md:py-16 overflow-y-auto">
             <header class="text-center mb-10 md:mb-16 space-y-4">
                 <img id="landingLogo" src="LOGO-fondo BIANCO-2026.png" alt="LEGO News 2PPL" class="h-28 md:h-40 mx-auto mb-6 object-contain transition-all duration-300 drop-shadow-lg">
-                <p class="text-lg md:text-2xl text-slate-500 max-w-2xl mx-auto font-light leading-relaxed">La piattaforma definitiva per restare aggiornati sulle News delle Live dei 2 Pazzi Per i Lego</p>
-                <div class="flex justify-center pt-6"><button onclick="enterApp()" class="bg-slate-900 text-white px-10 py-4 rounded-full font-bold text-lg hover:bg-slate-800 transition shadow-xl transform active:scale-95 cursor-pointer">Entra nelle News</button></div>
+                <p class="text-lg md:text-2xl text-slate-500 max-w-2xl mx-auto font-light leading-relaxed">La piattaforma definitiva per restare aggiornati sulle News e sulle Ideas dei 2 Pazzi Per i Lego</p>
+                <div class="flex justify-center pt-6"><button onclick="enterApp()" class="bg-slate-900 text-white px-10 py-4 rounded-full font-bold text-lg hover:bg-slate-800 transition shadow-xl transform active:scale-95 cursor-pointer">Entra</button></div>
             </header>
             <div class="grid grid-cols-1 landscape:grid-cols-2 md:grid-cols-3 gap-5 w-full max-w-5xl mx-auto pb-12">
                 <div onclick="enterApp()" class="landing-box col-span-1 landscape:col-span-2 md:col-span-2 p-6 md:p-8 rounded-[28px] relative overflow-hidden group cursor-pointer">
@@ -413,51 +433,20 @@
                         <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><circle cx="7" cy="7" r="2.5"></circle><circle cx="17" cy="7" r="2.5"></circle><circle cx="7" cy="17" r="2.5"></circle><circle cx="17" cy="17" r="2.5"></circle></svg>
                         </div>
-                        <h3 class="text-2xl font-bold mb-4">Consulta le News</h3>
+                        <h3 class="text-2xl font-bold mb-4">Consulta News & Ideas</h3>
                         <div class="space-y-3 text-left">
                             <div class="flex gap-3 items-start">
                                 <div>
                                     <img src="brick.png" class="bomb-icon-img" alt="brick">
                                 </div>
-                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Divertiti con noi: fai scoppiare i mattoncini nelle news ed assegna il tuo personale valore di "BOOM" </strong></p>
+                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Due mondi, una passione:</strong> Esplora le ultime News o immergiti nelle Ideas più creative.</p>
                             </div>
                             
                             <div class="flex gap-3 items-start">
                                 <div class="text-slate-900">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
                                 </div>
-                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Hall of Fame:</strong> Vota le migliori news e scopri la classifica.</p>
-                            </div>
-
-                            <div class="flex gap-3 items-start">
-                                <div class="text-slate-900">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <arrow-up-down class="lucide lucide-arrow-up-down"></arrow-up-down>
-                                        <path d="m21 16-4 4-4-4"></path>
-                                        <path d="M17 20V4"></path>
-                                        <path d="m3 8 4-4 4 4"></path>
-                                        <path d="M7 4v16"></path>
-                                    </svg>
-                                </div>
-                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Organizza il tuo flusso:</strong> Tieni premuto e trascina le schede per riordinare il feed.</p>
-                            </div>
-                            <div class="flex gap-3 items-start">
-                                <div class="text-slate-900">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
-                                        <circle cx="12" cy="12" r="3"></circle>
-                                    </svg>
-                                </div>
-                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Niente Spoiler Visivi:</strong> Immagini sfocate di default. Passa con il mouse sopra per vederle nitide.</p>
-                            </div>
-                            <div class="flex gap-3 items-start">
-                                <div class="text-slate-900">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path>
-                                        <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
-                                    </svg>
-                                </div>
-                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">YouTube Link:</strong> Accedi al video della live direttamente dal menu laterale.</p>
+                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Hall of Fame:</strong> Vota i contenuti migliori e scopri la classifica.</p>
                             </div>
                         </div>
                     </div>
@@ -475,13 +464,13 @@
                     </div>
                     <img src="fotocamera.png" class="absolute bottom-[-10%] right-[-5%] w-64 opacity-20 rotate-12 z-0 pointer-events-none mix-blend-overlay" alt="">
                     
-                    <div class="relative z-10 mt-4"><h3 class="text-2xl font-bold mb-1">Le News dell'ultima Live</h3><p class="text-slate-300 text-sm">Accedi subito.</p></div>
+                    <div class="relative z-10 mt-4"><h3 class="text-2xl font-bold mb-1">Ultima News Live</h3><p class="text-slate-300 text-sm">Accedi subito.</p></div>
                 </div>
                 <div class="landing-box col-span-1 landscape:col-span-1 md:col-span-3 bg-white/60 backdrop-blur-xl p-6 rounded-[28px] flex items-center gap-5">
                      <div class="shrink-0 w-14 h-14 bg-green-100 rounded-full flex items-center justify-center text-green-600">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><circle cx="7" cy="7" r="2.5"></circle><circle cx="17" cy="7" r="2.5"></circle><circle cx="7" cy="17" r="2.5"></circle><circle cx="17" cy="17" r="2.5"></circle></svg>
                     </div>
-                    <div><h3 class="text-lg font-bold">Navigazione & Archivi</h3><p class="text-slate-500 text-sm">Usa il menu per accedere allo storico delle Live. Le notizie sono ordinate cronologicamente per data.</p></div>
+                    <div><h3 class="text-lg font-bold">Navigazione & Archivi</h3><p class="text-slate-500 text-sm">Usa il menu per accedere allo storico delle Live.</p></div>
                 </div>
             </div>
             <footer class="mt-8 text-center text-slate-400 text-sm pb-8">&copy; 2026 Progettato pe la Community 2PPL </footer>
@@ -490,10 +479,19 @@
 
     <div id="appContainer" style="display:none;">
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header"><h2 class="sidebar-title" id="sidebarTitle">Seleziona Live</h2><button class="add-live-btn admin-only" onclick="createNewLive()">+</button></div>
-            <ul class="live-list" id="liveList"></ul>
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">News Live</h2>
+                <button class="add-live-btn admin-only" onclick="createNewLive('news')">+</button>
+            </div>
+            <ul class="live-list" id="liveListNews"></ul>
 
-            <div class="sidebar-header mt-8 admin-only"><h2 class="sidebar-title" style="font-size: 16px; color: var(--text-sec);">Modalità</h2></div>
+            <div class="sidebar-header" style="margin-top: 10px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 20px;">
+                <h2 class="sidebar-title">Ideas Live</h2>
+                <button class="add-live-btn admin-only" onclick="createNewLive('ideas')">+</button>
+            </div>
+            <ul class="live-list" id="liveListIdeas"></ul>
+
+            <div class="sidebar-header mt-8 admin-only" style="border-top: 1px solid rgba(0,0,0,0.05); padding-top: 20px;"><h2 class="sidebar-title" style="font-size: 16px; color: var(--text-sec);">Modalità</h2></div>
             <ul class="live-list admin-only">
                 <li class="live-item active" id="btnAdminMode" onclick="setAdminMode('management')">
                     <div class="live-item-content">
@@ -513,6 +511,18 @@
                 </li>
             </ul>
 
+            <div class="sidebar-header mt-8" id="userModeSection" style="display:none; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 20px;"><h2 class="sidebar-title" style="font-size: 16px; color: var(--text-sec);">Community</h2></div>
+            <ul class="live-list" id="userModeList" style="display:none;">
+                <li class="live-item active" id="btnUserLive" onclick="switchToUserMode()">
+                    <div class="live-item-content">
+                        <div style="width:32px; height:32px; background:rgba(0,122,255,0.1); border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--accent);">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        </div>
+                        <div class="live-info"><span class="live-name">Live Utenti</span></div>
+                    </div>
+                </li>
+            </ul>
+
         </aside>
         <main class="main-content">
             <div class="top-bar-controls">
@@ -527,11 +537,13 @@
                 <div class="header-top-row">
                     <div class="header-title-group">
                         <h1 id="headerTitle">Titolo Live</h1>
-                        <div class="logo-container"><img src="logo.png" alt="Logo" class="header-logo" onerror="this.style.display='none'"><img src="LOGO-fondo BIANCO-2026.png" alt="Logo 2PPL" class="header-logo" onerror="this.style.display='none'"></div>
+                        <div class="logo-container"><img src="LOGO-fondo BIANCO-2026.png" alt="Logo 2PPL" class="header-logo" onerror="this.style.display='none'"></div>
                     </div>
                     <button class="btn-add-news admin-only" onclick="openEditModal()">+</button>
                 </div>
-                <div class="nav-pills" id="navPillsContainer"></div>
+                <div id="stickyFilterContainer" class="sticky-filter-container" style="display:none;">
+                    <div class="nav-pills" id="navPillsContainer"></div>
+                </div>
             </header>
             <div id="emptyState" class="empty-state">
                 <div id="latestLiveBg"></div>
@@ -540,7 +552,7 @@
                     <img id="emptyStateLogo" class="empty-logo-img" src="" alt="Scegli una live" style="position: relative; z-index: 10; width: 100%; height: 100%; object-fit: contain; margin: 0;">
                 </div>
                 
-                <h1 class="text-4xl font-black tracking-tighter text-slate-900 mb-1" style="position: relative; z-index: 10; font-family: 'Inter', sans-serif;">NEWS</h1>
+                <h1 class="text-4xl font-black tracking-tighter text-slate-900 mb-1" style="position: relative; z-index: 10; font-family: 'Inter', sans-serif;">NEWS & IDEAS</h1>
 
                 <h3 class="text-xl font-bold mt-10" style="position: relative; z-index: 10;">Nessuna Live Selezionata</h3>
                 <p class="text-slate-500 mt-2" style="position: relative; z-index: 10;">Apri il menu per scegliere cosa guardare.</p>
@@ -604,7 +616,7 @@
             <div id="editMode" class="hidden modal-scrollable">
                 <button class="close-btn" onclick="closeModal()" style="background:rgba(0,0,0,0.5);color:white;">✕</button>
                 <div style="padding: 30px 20px;">
-                    <h2 style="margin-top:0; margin-bottom:20px;">Modifica News</h2>
+                    <h2 style="margin-top:0; margin-bottom:20px;">Modifica Elemento</h2>
                     <input type="hidden" id="editId">
                     <div class="form-group"><label class="form-label">Titolo</label><input type="text" id="editTitle" class="form-input"></div>
                     <div style="display: flex; gap: 15px; flex-wrap:wrap;">
@@ -650,7 +662,7 @@
         let currentLightboxIndex = 0;
         let currentActiveNewsId = null;
         let dragSrcEl = null;
-        let allCategories = new Set(['Star Wars', 'Harry Potter', 'City', 'Altro', 'Marvel', 'DC', 'Technic']);
+        let allCategories = new Set(['Star Wars', 'Harry Potter', 'City', 'Altro', 'Marvel', 'DC', 'Technic', 'Ideas']);
         let cachedNews = []; 
         let allLives = []; 
         let isAdmin = false;
@@ -675,17 +687,22 @@
             isAdmin = !!session; 
             const authIcon = document.getElementById('authIcon'); 
             const sidebarTitle = document.getElementById('sidebarTitle');
+            const userModeList = document.getElementById('userModeList');
+            const userModeSection = document.getElementById('userModeSection');
 
             if (isAdmin) { 
                 document.body.classList.add('is-admin'); 
                 authIcon.innerHTML = ICON_UNLOCKED; 
                 // Default admin view
                 setAdminMode('management'); 
+                userModeList.style.display = 'none';
+                userModeSection.style.display = 'none';
             } else { 
                 document.body.classList.remove('is-admin'); 
                 authIcon.innerHTML = ICON_LOCKED; 
                 currentViewMode = 'blog'; // User vede Blog
-                if(sidebarTitle) sidebarTitle.innerText = "Live Utenti";
+                userModeList.style.display = 'block';
+                userModeSection.style.display = 'flex';
             } 
             if(activeLiveId) refreshUI(); 
         }
@@ -697,10 +714,10 @@
             document.querySelectorAll('.live-list.admin-only .live-item').forEach(el => el.classList.remove('active'));
             if(mode === 'management') {
                 document.getElementById('btnAdminMode').classList.add('active');
-                document.getElementById('sidebarTitle').innerText = "Gestione Live";
+                document.getElementById('sidebar').classList.remove('locked'); // SBLOCCA scroll in gestione
             } else {
                 document.getElementById('btnUserMode').classList.add('active');
-                document.getElementById('sidebarTitle').innerText = "Live Utenti (Anteprima)";
+                document.getElementById('sidebar').classList.add('locked'); // BLOCCA scroll in vista utente
             }
             refreshUI();
         }
@@ -712,15 +729,78 @@
         function toggleDarkMode() { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('theme', isDark ? 'dark' : 'light'); document.getElementById('darkModeIcon').innerHTML = isDark ? ICON_SUN : ICON_MOON; updateDynamicImages(); }
         function updateDynamicImages() { const isDark = document.body.classList.contains('dark-mode'); const emptyImg = document.getElementById('emptyStateLogo'); const landingImg = document.getElementById('landingLogo'); const src = isDark ? 'LOGO-fondo NERO-2026.png' : 'LOGO-fondo BIANCO-2026.png'; if(emptyImg) emptyImg.src = src; if(landingImg) landingImg.src = src; }
         function enterApp() { document.getElementById('landingPage').classList.add('hidden'); const app = document.getElementById('appContainer'); app.style.display = 'flex'; setTimeout(() => app.classList.add('visible'), 50); activeLiveId = null; document.getElementById('sidebar').classList.add('collapsed'); document.getElementById('emptyState').style.display = 'flex'; document.getElementById('mainHeader').style.display = 'none'; document.getElementById('newsGrid').innerHTML = ''; }
-        function enterLatestLive() { if (allLives.length > 0) { document.getElementById('landingPage').classList.add('hidden'); const app = document.getElementById('appContainer'); app.style.display = 'flex'; setTimeout(() => app.classList.add('visible'), 50); selectLive(allLives[0]); if(window.innerWidth >= 1024) document.getElementById('sidebar').classList.remove('collapsed'); } else { enterApp(); } }
+        function enterLatestLive() { 
+            // Cerca la prima live di tipo NEWS o IDEAS (default su NEWS se miste, ma qui prendiamo la prima in ordine cronologico)
+            const latestNewsLive = allLives.find(l => l.type === 'news' || !l.type);
+            
+            if (latestNewsLive) { 
+                document.getElementById('landingPage').classList.add('hidden'); 
+                const app = document.getElementById('appContainer'); 
+                app.style.display = 'flex'; 
+                setTimeout(() => app.classList.add('visible'), 50); 
+                selectLive(latestNewsLive); 
+                if(window.innerWidth >= 1024) document.getElementById('sidebar').classList.remove('collapsed'); 
+            } else { 
+                enterApp(); 
+            } 
+        }
         async function initApp() { initTheme(); if(sbClient) { checkSession(); loadLives(); } else { console.warn("Offline Mode"); } }
         function getYoutubeId(url) { if(!url) return null; const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/; const match = url.match(regExp); return (match && match[2].length === 11) ? match[2] : null; }
         function openYoutube(e, url) { e.stopPropagation(); if(url) window.open(url, '_blank'); }
-        async function loadLives() { if(!sbClient) return; const { data: lives, error } = await sbClient.from('lives').select('*').order('live_date', { ascending: false }); if (error) { console.error(error); return; } allLives = lives || []; const list = document.getElementById('liveList'); list.innerHTML = ''; lives.forEach(live => { const li = document.createElement('li'); li.className = `live-item ${live.id === activeLiveId ? 'active' : ''}`; let thumbHTML = ''; const ytId = getYoutubeId(live.youtube_link); if(ytId) { const thumbUrl = `https://img.youtube.com/vi/${ytId}/mqdefault.jpg`; thumbHTML = `<div class="live-yt-thumb" onclick="openYoutube(event, '${live.youtube_link}')"><img src="${thumbUrl}"></div>`; } li.innerHTML = `<div class="live-item-content" onclick="selectLive({id: ${live.id}, name: '${live.name.replace(/'/g, "\\'")}'})">${thumbHTML}<div class="live-info"><span class="live-name">${live.name}</span><span class="live-date">${live.live_date || ''}</span></div></div><div class="live-actions"><button class="action-btn admin-only" title="Modifica" onclick="renameLive(event, ${live.id}, '${live.name.replace(/'/g, "\\'")}', '${live.live_date}', '${live.youtube_link || ''}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button><button class="action-btn delete-btn admin-only" title="Elimina" onclick="deleteLive(event, ${live.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div>`; list.appendChild(li); }); if(allLives.length > 0) loadLatestLivePreview(allLives[0].id); }
+        
+        // MODIFICATA PER GESTIRE DUE LISTE
+        async function loadLives() { 
+            if(!sbClient) return; 
+            const { data: lives, error } = await sbClient.from('lives').select('*').order('live_date', { ascending: false }); 
+            if (error) { console.error(error); return; } 
+            allLives = lives || []; 
+            
+            const listNews = document.getElementById('liveListNews'); 
+            const listIdeas = document.getElementById('liveListIdeas');
+            listNews.innerHTML = '';
+            listIdeas.innerHTML = '';
+
+            lives.forEach(live => { 
+                // Default type 'news' se null
+                const type = live.type || 'news';
+                const li = document.createElement('li'); 
+                li.className = `live-item ${live.id === activeLiveId ? 'active' : ''}`; 
+                
+                let thumbHTML = ''; 
+                const ytId = getYoutubeId(live.youtube_link); 
+                if(ytId) { 
+                    const thumbUrl = `https://img.youtube.com/vi/${ytId}/mqdefault.jpg`; 
+                    thumbHTML = `<div class="live-yt-thumb" onclick="openYoutube(event, '${live.youtube_link}')"><img src="${thumbUrl}"></div>`; 
+                } 
+                
+                li.innerHTML = `<div class="live-item-content" onclick="selectLive({id: ${live.id}, name: '${live.name.replace(/'/g, "\\'")}', type: '${type}'})">${thumbHTML}<div class="live-info"><span class="live-name">${live.name}</span><span class="live-date">${live.live_date || ''}</span></div></div><div class="live-actions"><button class="action-btn admin-only" title="Modifica" onclick="renameLive(event, ${live.id}, '${live.name.replace(/'/g, "\\'")}', '${live.live_date}', '${live.youtube_link || ''}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button><button class="action-btn delete-btn admin-only" title="Elimina" onclick="deleteLive(event, ${live.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div>`; 
+                
+                if (type === 'ideas') {
+                    listIdeas.appendChild(li);
+                } else {
+                    listNews.appendChild(li);
+                }
+            }); 
+            
+            if(allLives.length > 0) loadLatestLivePreview(allLives[0].id); 
+        }
+
         async function loadLatestLivePreview(liveId) { if(!sbClient || !liveId) return; const { data, error } = await sbClient.from('news').select('cover_image').eq('live_id', liveId).not('cover_image', 'is', null).limit(12); const container = document.getElementById('latestLiveBg'); if (container && !error && data && data.length > 0) { container.innerHTML = ''; data.forEach(item => { const img = document.createElement('img'); img.src = item.cover_image; container.appendChild(img); }); container.style.opacity = '1'; } }
-        async function createNewLive() { if(!isAdmin) return; const name = prompt("Nome Live:"); if(!name) return; const dateStr = prompt("Data Live (YYYY-MM-DD):", new Date().toISOString().split('T')[0]); const ytLink = prompt("Link YouTube (Opzionale):"); showLoader(); const { error } = await sbClient.from('lives').insert([{ name: name, live_date: dateStr, youtube_link: ytLink }]); if(!error) loadLives(); else { alert(error.message); hideLoader(); } }
+        
+        // MODIFICATO: ACCETTA TIPO
+        async function createNewLive(type) { 
+            if(!isAdmin) return; 
+            const name = prompt(`Nome Nuova ${type === 'ideas' ? 'Ideas' : 'News'} Live:`); 
+            if(!name) return; 
+            const dateStr = prompt("Data Live (YYYY-MM-DD):", new Date().toISOString().split('T')[0]); 
+            const ytLink = prompt("Link YouTube (Opzionale):"); 
+            showLoader(); 
+            const { error } = await sbClient.from('lives').insert([{ name: name, live_date: dateStr, youtube_link: ytLink, type: type }]); 
+            if(!error) loadLives(); else { alert(error.message); hideLoader(); } 
+        }
+
         async function renameLive(e, id, oldName, oldDate, oldLink) { e.stopPropagation(); if(!isAdmin) return; const newName = prompt("Nuovo nome Live:", oldName); const newDate = prompt("Nuova data Live (YYYY-MM-DD):", oldDate); const newLink = prompt("Nuovo Link YouTube:", oldLink); if(newName && newDate) { showLoader(); const { error } = await sbClient.from('lives').update({ name: newName, live_date: newDate, youtube_link: newLink }).eq('id', id); if(!error) loadLives(); else { alert(error.message); hideLoader(); } } }
-        async function deleteLive(e, id) { e.stopPropagation(); if(!isAdmin) return; if(confirm("Eliminare live?")) { showLoader(); await sbClient.from('news').delete().eq('live_id', id); await sbClient.from('lives').delete().eq('id', id); if(activeLiveId === id) { activeLiveId = null; document.getElementById('emptyState').style.display = 'flex'; document.getElementById('mainHeader').style.display = 'none'; document.getElementById('newsGrid').innerHTML = ''; } loadLives(); hideLoader(); } }
+        async function deleteLive(e, id) { e.stopPropagation(); if(!isAdmin) return; if(confirm("Eliminare live e tutti i contenuti?")) { showLoader(); await sbClient.from('news').delete().eq('live_id', id); await sbClient.from('lives').delete().eq('id', id); if(activeLiveId === id) { activeLiveId = null; document.getElementById('emptyState').style.display = 'flex'; document.getElementById('mainHeader').style.display = 'none'; document.getElementById('newsGrid').innerHTML = ''; } loadLives(); hideLoader(); } }
 
 
         function selectLive(live) {
@@ -729,21 +809,50 @@
             activeLiveId = live.id;
             
             // Refresh classe active nella lista date
-            document.querySelectorAll('#liveList .live-item').forEach(el => el.classList.remove('active'));
-            const items = document.querySelectorAll('#liveList .live-item');
+            document.querySelectorAll('.live-list .live-item').forEach(el => el.classList.remove('active'));
+            const items = document.querySelectorAll('.live-list .live-item');
             items.forEach(i => {
                 if(i.innerText.includes(live.name)) i.classList.add('active');
             });
             
+            // RIPRISTINA SCROLL SIDEBAR SE NON SIAMO IN USER MODE FORZATO
+            if(currentViewMode === 'grid') {
+                document.getElementById('sidebar').classList.remove('locked');
+            }
+            
             document.getElementById('emptyState').style.display = 'none';
             document.getElementById('mainHeader').style.display = 'flex';
             document.getElementById('headerTitle').innerText = live.name;
+            document.getElementById('stickyFilterContainer').style.display = 'block'; // Mostra filtri sticky
+            
             loadNews(live.id);
         }
 
         // NUOVA FUNZIONE PER LA VISTA UTENTI (USER-SIDE)
-        // L'utente non ha i tasti "Gestione", quindi non cambia currentViewMode
-        // L'utente vede sempre 'blog'
+        function switchToUserMode() {
+            if(window.innerWidth < 1024) document.getElementById('sidebar').classList.add('collapsed');
+            currentViewMode = 'blog';
+            
+            // BLOCCA SCROLL SIDEBAR
+            document.getElementById('sidebar').classList.add('locked');
+
+            // Gestione classi active solo per utente
+            document.querySelectorAll('.live-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('btnUserLive').classList.add('active');
+            
+            // Setup Header
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('mainHeader').style.display = 'flex';
+            document.getElementById('headerTitle').innerText = "Live Utenti";
+            document.getElementById('stickyFilterContainer').style.display = 'block'; // Mostra filtri
+
+            // Simulazione: mostra l'ultima live disponibile o tutte
+            if(allLives.length > 0) {
+                // Seleziona la prima live (la più recente)
+                activeLiveId = allLives[0].id;
+                loadNews(activeLiveId);
+            }
+        }
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
 
