@@ -22,7 +22,7 @@
             --accent: #007AFF;
             --danger: #FF3B30;
             --success: #34C759;
-            --gold: #FFD60A; /* Colore Coppa */
+            --gold: #FFD60A;
             --radius: 24px; 
             --font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             --sidebar-width: 320px;
@@ -121,7 +121,7 @@
         .blob-anim { animation: float 10s infinite ease-in-out; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
 
-        /* Stile personalizzato per i box della landing page (Stile macOS Tahoe Folder) */
+        /* Stile personalizzato per i box della landing page */
         .landing-box {
             background-color: rgba(255, 255, 255, 0.65);
             border: 2px solid rgba(255, 255, 255, 0.6); 
@@ -314,7 +314,6 @@
             background-color: var(--bg-input);
         }
         .blog-image { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease, filter 0.5s ease; filter: blur(8px); }
-        /* MODIFICA: Hover su immagine per sbloccare blur */
         .blog-image-wrapper:hover .blog-image { transform: scale(1.05); filter: blur(0); }
 
         .blog-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
@@ -338,26 +337,9 @@
         .modal-overlay.active .modal-card { transform: scale(1); }
         .modal-scrollable { overflow-y: auto; flex: 1; padding: 25px; }
         
-        /* Modal Fullscreen per modalità Blog */
-        #modalOverlay.fullscreen-mode {
-            padding: 0 !important;
-        }
-        #modalOverlay.fullscreen-mode .modal-card {
-            width: 100% !important;
-            height: 100% !important;
-            max-width: none !important;
-            max-height: none !important;
-            border-radius: 0 !important;
-            margin: 0 !important;
-            display: flex;
-            flex-direction: column;
-        }
-        /* Aggiustiamo l'immagine in fullscreen */
-        #modalOverlay.fullscreen-mode .modal-header-image {
-            height: 40vh; /* Più alta in fullscreen */
-            border-radius: 0;
-            margin-bottom: 20px;
-        }
+        #modalOverlay.fullscreen-mode { padding: 0 !important; }
+        #modalOverlay.fullscreen-mode .modal-card { width: 100% !important; height: 100% !important; max-width: none !important; max-height: none !important; border-radius: 0 !important; margin: 0 !important; display: flex; flex-direction: column; }
+        #modalOverlay.fullscreen-mode .modal-header-image { height: 40vh; border-radius: 0; margin-bottom: 20px; }
 
         #loginModal .modal-card { max-width: 350px !important; border-radius: 24px; }
         #loginModal .modal-body { padding: 30px 25px; }
@@ -436,16 +418,11 @@
                         <h3 class="text-2xl font-bold mb-4">Consulta News & Ideas</h3>
                         <div class="space-y-3 text-left">
                             <div class="flex gap-3 items-start">
-                                <div>
-                                    <img src="brick.png" class="bomb-icon-img" alt="brick">
-                                </div>
+                                <div><img src="brick.png" class="bomb-icon-img" alt="brick"></div>
                                 <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Due mondi, una passione:</strong> Esplora le ultime News o immergiti nelle Ideas più creative.</p>
                             </div>
-                            
                             <div class="flex gap-3 items-start">
-                                <div class="text-slate-900">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
-                                </div>
+                                <div class="text-slate-900"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg></div>
                                 <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Hall of Fame:</strong> Vota i contenuti migliori e scopri la classifica.</p>
                             </div>
                         </div>
@@ -481,13 +458,13 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h2 class="sidebar-title">News Live</h2>
-                <button class="add-live-btn admin-only" onclick="createNewLive('news')">+</button>
+                <button class="add-live-btn admin-only" id="btnAddNewsLive" onclick="createNewLive('news')">+</button>
             </div>
             <ul class="live-list" id="liveListNews"></ul>
 
             <div class="sidebar-header" style="margin-top: 10px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 20px;">
                 <h2 class="sidebar-title">Ideas Live</h2>
-                <button class="add-live-btn admin-only" onclick="createNewLive('ideas')">+</button>
+                <button class="add-live-btn admin-only" id="btnAddIdeasLive" onclick="createNewLive('ideas')">+</button>
             </div>
             <ul class="live-list" id="liveListIdeas"></ul>
 
@@ -539,7 +516,7 @@
                         <h1 id="headerTitle">Titolo Live</h1>
                         <div class="logo-container"><img src="LOGO-fondo BIANCO-2026.png" alt="Logo 2PPL" class="header-logo" onerror="this.style.display='none'"></div>
                     </div>
-                    <button class="btn-add-news admin-only" onclick="openEditModal()">+</button>
+                    <button id="btnMainAddNews" class="btn-add-news admin-only" onclick="openEditModal()">+</button>
                 </div>
                 <div id="stickyFilterContainer" class="sticky-filter-container" style="display:none;">
                     <div class="nav-pills" id="navPillsContainer"></div>
@@ -610,7 +587,7 @@
                     </div>
                     <div id="viewDesc"></div> 
                     <div id="viewImagesContainer"></div>
-                    <div class="btn-group admin-only mt-8"><button class="btn btn-text" onclick="switchToEdit()">Modifica News</button></div>
+                    <div class="btn-group admin-only mt-8" id="btnEditNewsContainer"><button class="btn btn-text" onclick="switchToEdit()">Modifica Elemento</button></div>
                 </div>
             </div>
             <div id="editMode" class="hidden modal-scrollable">
@@ -655,6 +632,7 @@
         }
 
         let activeLiveId = null;
+        let activeLiveType = 'news'; // 'news' o 'ideas'
         let currentFilter = 'Tutti';
         let tempCoverImage = '';
         let tempBodyImages = []; 
@@ -665,10 +643,12 @@
         let allCategories = new Set(['Star Wars', 'Harry Potter', 'City', 'Altro', 'Marvel', 'DC', 'Technic', 'Ideas']);
         let cachedNews = []; 
         let allLives = []; 
-        let isAdmin = false;
         let explodedState = {};
         
-        // NUOVO STATO: 'grid' o 'blog'
+        // STATO ADMIN
+        let isAdmin = false;
+        let userRole = null; // 'superadmin', 'ideas_editor', o null
+
         let currentViewMode = 'grid'; 
 
         const ICON_MOON = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
@@ -684,40 +664,64 @@
         async function checkSession() { if(!sbClient) return; try { const { data, error } = await sbClient.auth.getSession(); if (error) updateAuthUI(null); else updateAuthUI(data.session); sbClient.auth.onAuthStateChange((event, session) => { if (event === 'SIGNED_OUT' || event === 'USER_DELETED') updateAuthUI(null); else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') updateAuthUI(session); }); } catch (err) { updateAuthUI(null); } }
         
         function updateAuthUI(session) { 
-            isAdmin = !!session; 
+            isAdmin = !!session;
+            userRole = null;
+
+            if (isAdmin && session.user) {
+                // --- MODIFICA MANUALE QUI ---
+                // Se l'email è quella specifica, forza il ruolo "ideas_editor"
+                if (session.user.email === 'dreamnbricks@gmail.com') {
+                    userRole = 'ideas_editor';
+                } else {
+                    // Per tutti gli altri admin (es. te), assegna superadmin
+                    userRole = 'superadmin'; 
+                }
+                // -----------------------------
+            }
+            
             const authIcon = document.getElementById('authIcon'); 
-            const sidebarTitle = document.getElementById('sidebarTitle');
             const userModeList = document.getElementById('userModeList');
             const userModeSection = document.getElementById('userModeSection');
 
             if (isAdmin) { 
                 document.body.classList.add('is-admin'); 
                 authIcon.innerHTML = ICON_UNLOCKED; 
-                // Default admin view
                 setAdminMode('management'); 
                 userModeList.style.display = 'none';
                 userModeSection.style.display = 'none';
+
+                // Logica specifica Ruolo
+                if (userRole === 'ideas_editor') {
+                    // Nascondi tasto aggiunta News Live standard
+                    document.getElementById('btnAddNewsLive').style.display = 'none';
+                } else {
+                    document.getElementById('btnAddNewsLive').style.display = 'block';
+                }
+
             } else { 
                 document.body.classList.remove('is-admin'); 
                 authIcon.innerHTML = ICON_LOCKED; 
-                currentViewMode = 'blog'; // User vede Blog
+                currentViewMode = 'blog'; 
                 userModeList.style.display = 'block';
                 userModeSection.style.display = 'flex';
+                // Nascondi tutto
+                document.getElementById('btnAddNewsLive').style.display = 'none';
             } 
+            
+            // Ricarica le live per applicare i filtri sui bottoni delete/edit
+            if(allLives.length > 0) loadLives();
             if(activeLiveId) refreshUI(); 
         }
 
         function setAdminMode(mode) {
             currentViewMode = (mode === 'management') ? 'grid' : 'blog';
-            
-            // Aggiorna UI Sidebar
             document.querySelectorAll('.live-list.admin-only .live-item').forEach(el => el.classList.remove('active'));
             if(mode === 'management') {
                 document.getElementById('btnAdminMode').classList.add('active');
-                document.getElementById('sidebar').classList.remove('locked'); // SBLOCCA scroll in gestione
+                document.getElementById('sidebar').classList.remove('locked');
             } else {
                 document.getElementById('btnUserMode').classList.add('active');
-                document.getElementById('sidebar').classList.add('locked'); // BLOCCA scroll in vista utente
+                document.getElementById('sidebar').classList.add('locked');
             }
             refreshUI();
         }
@@ -730,9 +734,7 @@
         function updateDynamicImages() { const isDark = document.body.classList.contains('dark-mode'); const emptyImg = document.getElementById('emptyStateLogo'); const landingImg = document.getElementById('landingLogo'); const src = isDark ? 'LOGO-fondo NERO-2026.png' : 'LOGO-fondo BIANCO-2026.png'; if(emptyImg) emptyImg.src = src; if(landingImg) landingImg.src = src; }
         function enterApp() { document.getElementById('landingPage').classList.add('hidden'); const app = document.getElementById('appContainer'); app.style.display = 'flex'; setTimeout(() => app.classList.add('visible'), 50); activeLiveId = null; document.getElementById('sidebar').classList.add('collapsed'); document.getElementById('emptyState').style.display = 'flex'; document.getElementById('mainHeader').style.display = 'none'; document.getElementById('newsGrid').innerHTML = ''; }
         function enterLatestLive() { 
-            // Cerca la prima live di tipo NEWS o IDEAS (default su NEWS se miste, ma qui prendiamo la prima in ordine cronologico)
             const latestNewsLive = allLives.find(l => l.type === 'news' || !l.type);
-            
             if (latestNewsLive) { 
                 document.getElementById('landingPage').classList.add('hidden'); 
                 const app = document.getElementById('appContainer'); 
@@ -748,7 +750,6 @@
         function getYoutubeId(url) { if(!url) return null; const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/; const match = url.match(regExp); return (match && match[2].length === 11) ? match[2] : null; }
         function openYoutube(e, url) { e.stopPropagation(); if(url) window.open(url, '_blank'); }
         
-        // MODIFICATA PER GESTIRE DUE LISTE
         async function loadLives() { 
             if(!sbClient) return; 
             const { data: lives, error } = await sbClient.from('lives').select('*').order('live_date', { ascending: false }); 
@@ -761,7 +762,6 @@
             listIdeas.innerHTML = '';
 
             lives.forEach(live => { 
-                // Default type 'news' se null
                 const type = live.type || 'news';
                 const li = document.createElement('li'); 
                 li.className = `live-item ${live.id === activeLiveId ? 'active' : ''}`; 
@@ -772,8 +772,19 @@
                     const thumbUrl = `https://img.youtube.com/vi/${ytId}/mqdefault.jpg`; 
                     thumbHTML = `<div class="live-yt-thumb" onclick="openYoutube(event, '${live.youtube_link}')"><img src="${thumbUrl}"></div>`; 
                 } 
+
+                // LOGICA PERMESSI: Posso modificare questa live?
+                let canEditLive = isAdmin;
+                if (userRole === 'ideas_editor' && type !== 'ideas') {
+                    canEditLive = false;
+                }
                 
-                li.innerHTML = `<div class="live-item-content" onclick="selectLive({id: ${live.id}, name: '${live.name.replace(/'/g, "\\'")}', type: '${type}'})">${thumbHTML}<div class="live-info"><span class="live-name">${live.name}</span><span class="live-date">${live.live_date || ''}</span></div></div><div class="live-actions"><button class="action-btn admin-only" title="Modifica" onclick="renameLive(event, ${live.id}, '${live.name.replace(/'/g, "\\'")}', '${live.live_date}', '${live.youtube_link || ''}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button><button class="action-btn delete-btn admin-only" title="Elimina" onclick="deleteLive(event, ${live.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div>`; 
+                let actionButtons = '';
+                if (canEditLive) {
+                    actionButtons = `<div class="live-actions"><button class="action-btn admin-only" title="Modifica" onclick="renameLive(event, ${live.id}, '${live.name.replace(/'/g, "\\'")}', '${live.live_date}', '${live.youtube_link || ''}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button><button class="action-btn delete-btn admin-only" title="Elimina" onclick="deleteLive(event, ${live.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div>`;
+                }
+                
+                li.innerHTML = `<div class="live-item-content" onclick="selectLive({id: ${live.id}, name: '${live.name.replace(/'/g, "\\'")}', type: '${type}'})">${thumbHTML}<div class="live-info"><span class="live-name">${live.name}</span><span class="live-date">${live.live_date || ''}</span></div></div>${actionButtons}`; 
                 
                 if (type === 'ideas') {
                     listIdeas.appendChild(li);
@@ -782,14 +793,19 @@
                 }
             }); 
             
-            if(allLives.length > 0) loadLatestLivePreview(allLives[0].id); 
+            if(allLives.length > 0 && !activeLiveId) loadLatestLivePreview(allLives[0].id); 
         }
 
         async function loadLatestLivePreview(liveId) { if(!sbClient || !liveId) return; const { data, error } = await sbClient.from('news').select('cover_image').eq('live_id', liveId).not('cover_image', 'is', null).limit(12); const container = document.getElementById('latestLiveBg'); if (container && !error && data && data.length > 0) { container.innerHTML = ''; data.forEach(item => { const img = document.createElement('img'); img.src = item.cover_image; container.appendChild(img); }); container.style.opacity = '1'; } }
         
-        // MODIFICATO: ACCETTA TIPO
         async function createNewLive(type) { 
-            if(!isAdmin) return; 
+            if(!isAdmin) return;
+            
+            // Permesso: ideas_editor non può creare news
+            if (userRole === 'ideas_editor' && type !== 'ideas') {
+                return alert("Permesso negato: Puoi creare solo live Ideas.");
+            }
+
             const name = prompt(`Nome Nuova ${type === 'ideas' ? 'Ideas' : 'News'} Live:`); 
             if(!name) return; 
             const dateStr = prompt("Data Live (YYYY-MM-DD):", new Date().toISOString().split('T')[0]); 
@@ -807,15 +823,14 @@
             if(window.innerWidth < 1024) document.getElementById('sidebar').classList.add('collapsed');
             
             activeLiveId = live.id;
+            activeLiveType = live.type || 'news';
             
-            // Refresh classe active nella lista date
             document.querySelectorAll('.live-list .live-item').forEach(el => el.classList.remove('active'));
             const items = document.querySelectorAll('.live-list .live-item');
             items.forEach(i => {
                 if(i.innerText.includes(live.name)) i.classList.add('active');
             });
             
-            // RIPRISTINA SCROLL SIDEBAR SE NON SIAMO IN USER MODE FORZATO
             if(currentViewMode === 'grid') {
                 document.getElementById('sidebar').classList.remove('locked');
             }
@@ -823,32 +838,37 @@
             document.getElementById('emptyState').style.display = 'none';
             document.getElementById('mainHeader').style.display = 'flex';
             document.getElementById('headerTitle').innerText = live.name;
-            document.getElementById('stickyFilterContainer').style.display = 'block'; // Mostra filtri sticky
+            document.getElementById('stickyFilterContainer').style.display = 'block';
+
+            // VISIBILITÀ TASTO AGGIUNGI NEWS (HEADER)
+            const addBtn = document.getElementById('btnMainAddNews');
+            if (isAdmin) {
+                if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') {
+                    addBtn.style.display = 'none';
+                } else {
+                    addBtn.style.display = 'flex';
+                }
+            } else {
+                addBtn.style.display = 'none';
+            }
             
             loadNews(live.id);
         }
 
-        // NUOVA FUNZIONE PER LA VISTA UTENTI (USER-SIDE)
         function switchToUserMode() {
             if(window.innerWidth < 1024) document.getElementById('sidebar').classList.add('collapsed');
             currentViewMode = 'blog';
             
-            // BLOCCA SCROLL SIDEBAR
             document.getElementById('sidebar').classList.add('locked');
-
-            // Gestione classi active solo per utente
             document.querySelectorAll('.live-item').forEach(el => el.classList.remove('active'));
             document.getElementById('btnUserLive').classList.add('active');
-            
-            // Setup Header
             document.getElementById('emptyState').style.display = 'none';
             document.getElementById('mainHeader').style.display = 'flex';
             document.getElementById('headerTitle').innerText = "Live Utenti";
-            document.getElementById('stickyFilterContainer').style.display = 'block'; // Mostra filtri
+            document.getElementById('stickyFilterContainer').style.display = 'block';
+            document.getElementById('btnMainAddNews').style.display = 'none'; // User non aggiunge
 
-            // Simulazione: mostra l'ultima live disponibile o tutte
             if(allLives.length > 0) {
-                // Seleziona la prima live (la più recente)
                 activeLiveId = allLives[0].id;
                 loadNews(activeLiveId);
             }
@@ -871,6 +891,9 @@
         }
 
         async function toggleNewsStatus(id, newStatus) {
+            // Se sono ideas_editor e provo a cambiare stato a news, blocco (anche se l'UI non dovrebbe mostrarlo)
+            if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') return;
+
             const newsItem = cachedNews.find(n => n.id === id);
             if (newsItem) newsItem.is_online = newStatus;
             refreshUI(); 
@@ -885,7 +908,6 @@
             if (currentFilter !== 'Tutti' && !liveCategories.has(currentFilter)) currentFilter = 'Tutti';
             updatePillsState();
             
-            // DECISIONE DI RENDERING
             if(currentViewMode === 'blog') {
                 renderBlogFromCache();
             } else {
@@ -915,14 +937,17 @@
             });
         }
         
-        // RENDER STANDARD (GRIGLIA)
         function renderGridFromCache() {
             const grid = document.getElementById('newsGrid');
-            grid.className = 'grid-container'; // Ripristina classe griglia
+            grid.className = 'grid-container';
             grid.innerHTML = '';
             let filtered = cachedNews;
             if(currentFilter !== 'Tutti') filtered = cachedNews.filter(n => n.category === currentFilter);
             if (!isAdmin) filtered = filtered.filter(n => n.is_online === true);
+
+            // Controllo permessi per drag & drop e toggle
+            let canEditContent = isAdmin;
+            if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') canEditContent = false;
 
             const fragment = document.createDocumentFragment();
             filtered.forEach(item => {
@@ -930,20 +955,22 @@
                 card.className = 'card';
                 card.dataset.id = item.id; 
                 if (isAdmin && !item.is_online) card.classList.add('offline-mode');
-                if(isAdmin) card.draggable = true; 
-                if(isAdmin) {
+                
+                if(canEditContent) {
+                    card.draggable = true; 
                     card.addEventListener('dragstart', handleDragStart);
                     card.addEventListener('dragover', handleDragOver);
                     card.addEventListener('drop', handleDrop);
                     card.addEventListener('dragend', handleDragEnd);
                 }
+                
                 card.onclick = (e) => { 
                     if(e.target.closest('.admin-toggle-container') || e.target.closest('.bomb-container') || e.target.closest('.trophy-container') || card.classList.contains('dragging')) return;
                     openViewModal(item); 
                 }; 
                 
                 let toggleHTML = '';
-                if (isAdmin) {
+                if (isAdmin && canEditContent) {
                     toggleHTML = `<div class="admin-toggle-container" onclick="event.stopPropagation()">
                             <span class="toggle-status-label">${item.is_online ? 'ON' : 'OFF'}</span>
                             <label class="apple-switch"><input type="checkbox" ${item.is_online ? 'checked' : ''} onchange="toggleNewsStatus(${item.id}, this.checked)"><span class="slider"></span></label>
@@ -988,20 +1015,22 @@
             grid.appendChild(fragment);
         }
 
-        // NUOVO RENDER (BLOG)
         function renderBlogFromCache() {
             const container = document.getElementById('newsGrid');
-            container.className = 'blog-container'; // Cambia classe contenitore
+            container.className = 'blog-container';
             container.innerHTML = '';
             
             let filtered = cachedNews;
             if(currentFilter !== 'Tutti') filtered = cachedNews.filter(n => n.category === currentFilter);
             if (!isAdmin) filtered = filtered.filter(n => n.is_online === true);
 
+            let canEditContent = isAdmin;
+            if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') canEditContent = false;
+
             const fragment = document.createDocumentFragment();
             filtered.forEach(item => {
                 const card = document.createElement('div');
-                card.className = 'blog-card'; // Classe stile blog
+                card.className = 'blog-card';
                 card.dataset.id = item.id;
                 
                 card.onclick = (e) => { 
@@ -1010,7 +1039,7 @@
                 };
 
                 let toggleHTML = '';
-                if (isAdmin) {
+                if (isAdmin && canEditContent) {
                     toggleHTML = `<div class="admin-toggle-container" onclick="event.stopPropagation()" style="top:10px; right:10px;">
                             <label class="apple-switch"><input type="checkbox" ${item.is_online ? 'checked' : ''} onchange="toggleNewsStatus(${item.id}, this.checked)"><span class="slider"></span></label>
                         </div>`;
@@ -1020,7 +1049,6 @@
                 const voteClass = hasVoted ? 'voted' : '';
                 const bg = item.cover_image ? item.cover_image : '';
                 
-                // Pulisce la descrizione per l'anteprima
                 let plainText = item.description.replace(/\[\[IMMAGINE \d+\]\]/g, '').replace(/<[^>]*>?/gm, '').trim();
                 if(plainText.length > 120) plainText = plainText.substring(0, 120) + "...";
 
@@ -1138,7 +1166,6 @@
             document.getElementById('editMode').classList.add('hidden');
             document.getElementById('modalOverlay').classList.add('active');
             
-            // MODIFICA: Se è modalità Blog, apri modal fullscreen e usa selettore corretto
             const modalMainCard = document.querySelector('#modalOverlay .modal-card'); 
             if(currentViewMode === 'blog') {
                 document.getElementById('modalOverlay').classList.add('fullscreen-mode');
@@ -1146,6 +1173,18 @@
             } else {
                 document.getElementById('modalOverlay').classList.remove('fullscreen-mode');
                 modalMainCard.classList.remove('fullscreen');
+            }
+
+            // GESTIONE VISIBILITÀ TASTO MODIFICA NEL MODAL
+            const btnEditContainer = document.getElementById('btnEditNewsContainer');
+            if (isAdmin) {
+                if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') {
+                    btnEditContainer.style.display = 'none';
+                } else {
+                    btnEditContainer.style.display = 'flex';
+                }
+            } else {
+                btnEditContainer.style.display = 'none';
             }
 
             const { data: fullItem, error } = await sbClient.from('news').select('body_images').eq('id', partialItem.id).single();
@@ -1172,6 +1211,9 @@
 
         async function openEditModal(id = null) {
             if(!isAdmin) return;
+            // Doppio controllo permesso (nel caso chiamino la funzione da console)
+            if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') return alert("Non hai i permessi per modificare News.");
+
             tempCoverImage = ''; tempBodyImages = [];
             document.getElementById('fileInputCover').value = '';
             document.getElementById('fileInputBody').value = '';
@@ -1215,6 +1257,10 @@
 
         async function saveNews() {
             if(!activeLiveId || !isAdmin) return;
+            
+            // Controllo permessi salvataggio
+            if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') return alert("Permesso negato");
+
             const idInput = document.getElementById('editId').value;
             const title = document.getElementById('editTitle').value;
             const category = document.getElementById('editCategory').value;
@@ -1253,6 +1299,8 @@
 
         async function deleteCurrentNews() {
             if(!isAdmin) return;
+            if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') return alert("Permesso negato");
+            
             if(confirm("Eliminare?")) {
                 showLoader();
                 await sbClient.from('news').delete().eq('id', currentActiveNewsId);
