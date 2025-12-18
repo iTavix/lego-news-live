@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>LEGO News Live 2PPL</title>
+    <link rel="icon" href="LOGO-fondo BIANCO-2026.png" type="image/png">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -40,7 +42,7 @@
         .admin-only { display: none !important; }
         body.is-admin .admin-only { display: flex !important; }
 
-        /* --- STILI COPPA (VOTO) --- */
+        /* --- STILI HALL OF FAME (COPPA) --- */
         .trophy-container {
             display: inline-flex; align-items: center; justify-content: center;
             width: 32px; height: 32px; margin-left: auto; cursor: pointer;
@@ -51,7 +53,6 @@
             width: 22px; height: 22px; fill: none; stroke: var(--text-sec);
             stroke-width: 2; transition: all 0.3s ease; opacity: 0.6;
         }
-        /* Stato Attivo (Votato) */
         .trophy-container.voted .trophy-icon {
             fill: var(--gold); stroke: var(--gold); opacity: 1;
             filter: drop-shadow(0 0 8px rgba(255, 214, 10, 0.5));
@@ -65,19 +66,16 @@
             100% { transform: scale(1) rotate(0deg); }
         }
 
-        /* --- LISTA CLASSIFICA (HALL OF FAME) --- */
+        /* --- CLASSIFICA --- */
         .ranking-list { list-style: none; padding: 0; margin: 0; }
         .ranking-item { 
             display: flex; align-items: center; gap: 15px; padding: 15px; 
             background: var(--bg-input); border-radius: 20px; margin-bottom: 12px;
         }
-        .ranking-pos { 
-            font-size: 24px; font-weight: 900; color: var(--text-sec); width: 30px; text-align: center; 
-        }
-        .ranking-item:nth-child(1) .ranking-pos { color: #FFD700; } /* Oro */
-        .ranking-item:nth-child(2) .ranking-pos { color: #C0C0C0; } /* Argento */
-        .ranking-item:nth-child(3) .ranking-pos { color: #CD7F32; } /* Bronzo */
-        
+        .ranking-pos { font-size: 24px; font-weight: 900; color: var(--text-sec); width: 30px; text-align: center; }
+        .ranking-item:nth-child(1) .ranking-pos { color: #FFD700; }
+        .ranking-item:nth-child(2) .ranking-pos { color: #C0C0C0; }
+        .ranking-item:nth-child(3) .ranking-pos { color: #CD7F32; }
         .ranking-thumb { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; background-color: #ccc; }
         .ranking-info { flex: 1; overflow: hidden; }
         .ranking-title { font-weight: 700; font-size: 16px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); }
@@ -89,6 +87,7 @@
         }
         .vote-number { font-size: 18px; font-weight: 800; color: var(--text-main); }
         .vote-label { font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--text-sec); }
+
 
         /* --- TOGGLE APPLE --- */
         .admin-toggle-container {
@@ -121,6 +120,37 @@
         @keyframes float { 0% { transform: translate(0px, 0px) scale(1); } 33% { transform: translate(30px, -50px) scale(1.1); } 66% { transform: translate(-20px, 20px) scale(0.9); } 100% { transform: translate(0px, 0px) scale(1); } }
         .blob-anim { animation: float 10s infinite ease-in-out; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+
+        /* Stile personalizzato per i box della landing page (Stile macOS Tahoe Folder) */
+        .landing-box {
+            background-color: rgba(255, 255, 255, 0.65);
+            border: 2px solid rgba(255, 255, 255, 0.6); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(255,255,255,0.5);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.3s;
+        }
+        .landing-box:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.9); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15), inset 0 0 0 1px rgba(255,255,255,0.8);
+        }
+        
+        body.dark-mode .landing-box {
+            background-color: rgba(30, 30, 30, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.1);
+        }
+        body.dark-mode .landing-box:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        
+        .landing-box.live-box {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
 
         /* --- LAYOUT --- */
         #appContainer { display: flex; width: 100%; height: 100%; opacity: 0; transition: opacity 0.5s ease 0.3s; }
@@ -159,7 +189,6 @@
         .icon-btn { background: var(--bg-card); border: 1px solid transparent; box-shadow: 0 2px 6px rgba(0,0,0,0.05); border-radius: 50%; width: 44px; height: 44px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-main); font-size: 20px; transition: 0.2s; }
         .icon-btn:hover { transform: scale(1.05); }
         .icon-btn svg { display: block; }
-        /* Badge per il tasto Hall of Fame */
         .icon-btn.gold-btn { color: #FFD60A; background: var(--bg-card); border-color: rgba(255, 214, 10, 0.3); }
         .icon-btn.gold-btn:hover { background: rgba(255, 214, 10, 0.1); }
 
@@ -203,14 +232,16 @@
         }
         #latestLiveBg img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* --- GRIGLIA NEWS --- */
+        /* --- GRIGLIA NEWS (CARD STANDARD) --- */
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; width: 100%; }
         @media (max-width: 640px) { .grid-container { grid-template-columns: 1fr; } }
         @media (min-width: 641px) and (max-width: 1024px) { .grid-container { grid-template-columns: repeat(2, 1fr); } }
 
         /* --- CARD --- */
         .card { 
-            background: var(--bg-card); border-radius: 28px; padding: 16px; 
+            background: var(--bg-card); 
+            border-radius: 16px; 
+            padding: 10px; 
             box-shadow: 0 0 0 1px rgba(0,0,0,0.03), 0 4px 12px rgba(0,0,0,0.05), 0 12px 30px rgba(0,0,0,0.08);
             cursor: pointer; transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             display: flex; flex-direction: column; position: relative;
@@ -219,11 +250,23 @@
         .card:active { transform: scale(0.98); }
         .card.offline-mode .card-image-small { filter: grayscale(100%); opacity: 0.5; }
         
-        .card-image-wrapper { width: 100%; height: 200px; border-radius: 20px; overflow: hidden; background-color: var(--bg-input); position: relative; margin-bottom: 16px; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.15); }
+        .card-image-wrapper { 
+            width: 100%; height: 200px; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            background-color: var(--bg-input); 
+            position: relative; 
+            margin-bottom: 16px; 
+            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.15); 
+            transform: translateZ(0);
+            -webkit-mask-image: -webkit-radial-gradient(white, black);
+        }
+        
         .fade-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, var(--bg-input) 0%, transparent 50%); transition: opacity 0.4s ease; pointer-events: none; opacity: 1; z-index: 10; }
         .card:hover .fade-overlay { opacity: 0; }
-        .card-image-small { width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.5s ease; }
-        .card:hover .card-image-small { transform: scale(1.05); }
+        
+        .card-image-small { width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.5s ease, filter 0.5s ease; filter: blur(8px); }
+        .card:hover .card-image-small { transform: scale(1.05); filter: blur(0); }
 
         .card-content { display: flex; flex-direction: column; flex-grow: 1; pointer-events: none; padding: 0 4px; }
         .card-meta-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
@@ -231,6 +274,40 @@
         .card-bombs { display: inline-flex; align-items: center; pointer-events: auto; }
         
         .card-title { font-size: 20px; font-weight: 700; margin: 0; line-height: 1.35; color: var(--text-main); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; letter-spacing: -0.3px; }
+
+
+        /* --- NUOVA VISTA: BLOG UTENTI --- */
+        .blog-container { display: flex; flex-direction: column; gap: 24px; max-width: 800px; margin: 0 auto; padding-bottom: 40px; }
+        .blog-card {
+            display: flex; gap: 24px;
+            background: var(--bg-card);
+            border-radius: 20px; padding: 20px;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 10px 25px -5px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        .blog-card:hover { transform: translateY(-3px); box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 20px 40px -10px rgba(0,0,0,0.15); }
+        
+        .blog-image-wrapper {
+            width: 280px; height: 180px; flex-shrink: 0;
+            border-radius: 12px; overflow: hidden; position: relative;
+            background-color: var(--bg-input);
+        }
+        .blog-image { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease, filter 0.5s ease; filter: blur(8px); }
+        /* MODIFICA: Hover su immagine per sbloccare blur */
+        .blog-image-wrapper:hover .blog-image { transform: scale(1.05); filter: blur(0); }
+
+        .blog-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .blog-meta-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .blog-category { font-size: 12px; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .blog-title { font-size: 24px; font-weight: 800; line-height: 1.3; color: var(--text-main); margin-bottom: 12px; }
+        .blog-desc { font-size: 15px; color: var(--text-sec); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+        @media (max-width: 768px) {
+            .blog-card { flex-direction: column; }
+            .blog-image-wrapper { width: 100%; height: 220px; }
+            .blog-content { margin-top: 10px; }
+        }
 
         /* MODALS */
         .login-form { display: flex; flex-direction: column; gap: 15px; }
@@ -240,6 +317,27 @@
         .modal-card { width: 100%; max-width: 800px; height: auto; max-height: 90vh; background: var(--bg-card); border-radius: 28px; overflow: hidden; position: relative; box-shadow: 0 40px 80px rgba(0,0,0,0.3); transform: scale(0.96); transition: transform 0.3s; display: flex; flex-direction: column; color: var(--text-main); }
         .modal-overlay.active .modal-card { transform: scale(1); }
         .modal-scrollable { overflow-y: auto; flex: 1; padding: 25px; }
+        
+        /* Modal Fullscreen per modalità Blog */
+        #modalOverlay.fullscreen-mode {
+            padding: 0 !important;
+        }
+        #modalOverlay.fullscreen-mode .modal-card {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: none !important;
+            max-height: none !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            display: flex;
+            flex-direction: column;
+        }
+        /* Aggiustiamo l'immagine in fullscreen */
+        #modalOverlay.fullscreen-mode .modal-header-image {
+            height: 40vh; /* Più alta in fullscreen */
+            border-radius: 0;
+            margin-bottom: 20px;
+        }
 
         #loginModal .modal-card { max-width: 350px !important; border-radius: 24px; }
         #loginModal .modal-body { padding: 30px 25px; }
@@ -301,11 +399,16 @@
         <main class="w-full min-h-full flex flex-col justify-center max-w-7xl mx-auto px-4 py-10 md:py-16 overflow-y-auto">
             <header class="text-center mb-10 md:mb-16 space-y-4">
                 <img id="landingLogo" src="LOGO-fondo BIANCO-2026.png" alt="LEGO News 2PPL" class="h-28 md:h-40 mx-auto mb-6 object-contain transition-all duration-300 drop-shadow-lg">
-                <p class="text-lg md:text-2xl text-slate-500 max-w-2xl mx-auto font-light leading-relaxed">La piattaforma definitiva per restare aggiornati sulle News della Live dei 2 Pazzi Per i Lego</p>
+                <p class="text-lg md:text-2xl text-slate-500 max-w-2xl mx-auto font-light leading-relaxed">La piattaforma definitiva per restare aggiornati sulle News delle Live dei 2 Pazzi Per i Lego</p>
                 <div class="flex justify-center pt-6"><button onclick="enterApp()" class="bg-slate-900 text-white px-10 py-4 rounded-full font-bold text-lg hover:bg-slate-800 transition shadow-xl transform active:scale-95 cursor-pointer">Entra nelle News</button></div>
             </header>
             <div class="grid grid-cols-1 landscape:grid-cols-2 md:grid-cols-3 gap-5 w-full max-w-5xl mx-auto pb-12">
-                <div onclick="enterApp()" class="col-span-1 landscape:col-span-2 md:col-span-2 bg-white/60 backdrop-blur-xl border border-white/40 p-6 md:p-8 rounded-[28px] shadow-sm hover:shadow-lg active:scale-[0.98] transition duration-200 relative overflow-hidden group cursor-pointer">
+                <div onclick="enterApp()" class="landing-box col-span-1 landscape:col-span-2 md:col-span-2 p-6 md:p-8 rounded-[28px] relative overflow-hidden group cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="absolute bottom-5 right-5 w-40 h-40 opacity-20 text-blue-600 rotate-12 z-0 pointer-events-none mix-blend-overlay">
+                      <path fill-rule="evenodd" d="M4.125 3C3.089 3 2.25 3.84 2.25 4.875V18a3 3 0 0 0 3 3h15a3 3 0 0 1-3-3V4.875C17.25 3.84 16.411 3 15.375 3H4.125ZM12 9.75a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H12Zm-.75-2.25a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 0 1.5H12a.75.75 0 0 1-.75-.75ZM6 12.75a.75.75 0 0 0 0 1.5h7.5a.75.75 0 0 0 0-1.5H6Zm-.75 3.75a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5H6a.75.75 0 0 1-.75-.75ZM6 6.75a.75.75 0 0 0-.75.75v3c0 .414.336.75.75.75h3a.75.75 0 0 0 .75-.75v-3A.75.75 0 0 0 9 6.75H6Z" clip-rule="evenodd" />
+                      <path d="M18.75 6.75h1.875c.621 0 1.125.504 1.125 1.125V18a1.5 1.5 0 0 1-3 0V6.75Z" />
+                    </svg>
+
                     <div class="relative z-10">
                         <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><circle cx="7" cy="7" r="2.5"></circle><circle cx="17" cy="7" r="2.5"></circle><circle cx="7" cy="17" r="2.5"></circle><circle cx="17" cy="17" r="2.5"></circle></svg>
@@ -313,21 +416,21 @@
                         <h3 class="text-2xl font-bold mb-4">Consulta le News</h3>
                         <div class="space-y-3 text-left">
                             <div class="flex gap-3 items-start">
-                                <div class="pt-1">
-                                    <img src="brick_land.png" class="bomb-icon-img" alt="brick">
+                                <div>
+                                    <img src="brick.png" class="bomb-icon-img" alt="brick">
                                 </div>
-                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Divertiti con noi:</strong> fai scoppiare i mattoncini nelle news ed assegna il tuo personale valore alle News.</p>
+                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Divertiti con noi: fai scoppiare i mattoncini nelle news ed assegna il tuo personale valore di "BOOM" </strong></p>
                             </div>
                             
                             <div class="flex gap-3 items-start">
-                                <div class="text-slate-900 pt-1">
+                                <div class="text-slate-900">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
                                 </div>
-                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Best News:</strong> Clicca sulla coppa nella scheda per votare la tua notizia preferita della puntata.</p>
+                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Hall of Fame:</strong> Vota le migliori news e scopri la classifica.</p>
                             </div>
 
                             <div class="flex gap-3 items-start">
-                                <div class="text-slate-900 pt-1">
+                                <div class="text-slate-900">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <arrow-up-down class="lucide lucide-arrow-up-down"></arrow-up-down>
                                         <path d="m21 16-4 4-4-4"></path>
@@ -339,16 +442,16 @@
                                 <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Organizza il tuo flusso:</strong> Tieni premuto e trascina le schede per riordinare il feed.</p>
                             </div>
                             <div class="flex gap-3 items-start">
-                                <div class="text-slate-900 pt-1">
+                                <div class="text-slate-900">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
                                         <circle cx="12" cy="12" r="3"></circle>
                                     </svg>
                                 </div>
-                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Niente Spoiler Visivi:</strong> Immagini sfocate di default. Clicca per vederle nitide.</p>
+                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Niente Spoiler Visivi:</strong> Immagini sfocate di default. Passa con il mouse sopra per vederle nitide.</p>
                             </div>
                             <div class="flex gap-3 items-start">
-                                <div class="text-slate-900 pt-1">
+                                <div class="text-slate-900">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path>
                                         <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
@@ -359,7 +462,7 @@
                         </div>
                     </div>
                 </div>
-                <div onclick="enterLatestLive()" class="col-span-1 bg-gradient-to-b from-slate-900 to-slate-800 text-white p-6 md:p-8 rounded-[28px] shadow-xl hover:shadow-2xl active:scale-[0.98] transition duration-200 relative overflow-hidden group cursor-pointer min-h-[220px] flex flex-col justify-between">
+                <div onclick="enterLatestLive()" class="landing-box col-span-1 bg-gradient-to-b from-slate-900 to-slate-800 text-white p-6 md:p-8 rounded-[28px] relative overflow-hidden group cursor-pointer min-h-[220px] flex flex-col justify-between live-box">
                     <div class="absolute top-0 right-0 w-64 h-64 bg-purple-500 rounded-full filter blur-[80px] opacity-30 group-hover:opacity-50 transition"></div>
                     <div class="flex justify-between items-start relative z-10">
                         <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md">
@@ -370,11 +473,11 @@
                         </div>
                         <span class="bg-red-500/20 text-red-300 text-xs font-bold px-3 py-1 rounded-full border border-red-500/30 flex items-center gap-2"><span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> LIVE</span>
                     </div>
-                    <img src="fotocamera.jpg" class="absolute bottom-[-10%] right-[-5%] w-64 opacity-10 rotate-12 z-0 pointer-events-none mix-blend-overlay" alt="">
+                    <img src="fotocamera.png" class="absolute bottom-[-10%] right-[-5%] w-64 opacity-20 rotate-12 z-0 pointer-events-none mix-blend-overlay" alt="">
                     
-                    <div class="relative z-10 mt-4"><h3 class="text-2xl font-bold mb-1">L'ultima Live</h3><p class="text-slate-300 text-sm">Accedi subito.</p></div>
+                    <div class="relative z-10 mt-4"><h3 class="text-2xl font-bold mb-1">Le News dell'ultima Live</h3><p class="text-slate-300 text-sm">Accedi subito.</p></div>
                 </div>
-                <div class="col-span-1 landscape:col-span-1 md:col-span-3 bg-white/60 backdrop-blur-xl border border-white/40 p-6 rounded-[28px] shadow-sm flex items-center gap-5">
+                <div class="landing-box col-span-1 landscape:col-span-1 md:col-span-3 bg-white/60 backdrop-blur-xl p-6 rounded-[28px] flex items-center gap-5">
                      <div class="shrink-0 w-14 h-14 bg-green-100 rounded-full flex items-center justify-center text-green-600">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><circle cx="7" cy="7" r="2.5"></circle><circle cx="17" cy="7" r="2.5"></circle><circle cx="7" cy="17" r="2.5"></circle><circle cx="17" cy="17" r="2.5"></circle></svg>
                     </div>
@@ -387,18 +490,37 @@
 
     <div id="appContainer" style="display:none;">
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header"><h2 class="sidebar-title">Seleziona Live</h2><button class="add-live-btn admin-only" onclick="createNewLive()">+</button></div>
+            <div class="sidebar-header"><h2 class="sidebar-title" id="sidebarTitle">Seleziona Live</h2><button class="add-live-btn admin-only" onclick="createNewLive()">+</button></div>
             <ul class="live-list" id="liveList"></ul>
+
+            <div class="sidebar-header mt-8 admin-only"><h2 class="sidebar-title" style="font-size: 16px; color: var(--text-sec);">Modalità</h2></div>
+            <ul class="live-list admin-only">
+                <li class="live-item active" id="btnAdminMode" onclick="setAdminMode('management')">
+                    <div class="live-item-content">
+                        <div style="width:32px; height:32px; background:rgba(0,122,255,0.1); border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--accent);">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                        </div>
+                        <div class="live-info"><span class="live-name">Gestione</span></div>
+                    </div>
+                </li>
+                <li class="live-item" id="btnUserMode" onclick="setAdminMode('user')">
+                    <div class="live-item-content">
+                        <div style="width:32px; height:32px; background:rgba(52,199,89,0.1); border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--success);">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        </div>
+                        <div class="live-info"><span class="live-name">Vista Utente</span></div>
+                    </div>
+                </li>
+            </ul>
+
         </aside>
         <main class="main-content">
             <div class="top-bar-controls">
                 <button class="icon-btn" onclick="toggleSidebar()" title="Menu"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
                 <button class="icon-btn" onclick="toggleDarkMode()" title="Dark Mode"><span id="darkModeIcon" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;"></span></button>
-                
                 <button class="icon-btn gold-btn" onclick="openBestNewsModal()" title="Classifica Migliori News">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
                 </button>
-                
                 <button class="icon-btn" onclick="toggleLogin()" title="Admin Login" style="margin-left: auto;"><span id="authIcon" style="display: flex; align-items: center; justify-content: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span></button>
             </div>
             <header class="main-header" id="mainHeader" style="display:none;">
@@ -417,12 +539,15 @@
                     <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); filter: blur(24px); opacity: 0.5; border-radius: 50%; animation: pulse 3s infinite;"></div>
                     <img id="emptyStateLogo" class="empty-logo-img" src="" alt="Scegli una live" style="position: relative; z-index: 10; width: 100%; height: 100%; object-fit: contain; margin: 0;">
                 </div>
+                
                 <h1 class="text-4xl font-black tracking-tighter text-slate-900 mb-1" style="position: relative; z-index: 10; font-family: 'Inter', sans-serif;">NEWS</h1>
+
                 <h3 class="text-xl font-bold mt-10" style="position: relative; z-index: 10;">Nessuna Live Selezionata</h3>
                 <p class="text-slate-500 mt-2" style="position: relative; z-index: 10;">Apri il menu per scegliere cosa guardare.</p>
                 <button onclick="toggleSidebar()" class="mt-6 bg-slate-200 text-slate-800 px-6 py-3 rounded-xl font-bold" style="position: relative; z-index: 10;">Apri Menu</button>
             </div>
-            <div class="grid-container" id="newsGrid"></div>
+            
+            <div id="newsGrid" class="grid-container"></div>
         </main>
     </div>
 
@@ -440,7 +565,7 @@
             </div>
         </div>
     </div>
-
+    
     <div class="modal-overlay" id="bestNewsModal">
         <div class="modal-card" style="width: 100%; max-width: 600px; height: 80vh;">
             <div class="modal-scrollable">
@@ -452,8 +577,7 @@
                     <h2 style="margin: 0; font-size: 28px; font-weight: 800;">Hall of Fame</h2>
                     <p style="color: var(--text-sec); margin-top: 5px;">Le News più votate dalla community</p>
                 </div>
-                <div id="bestNewsListContainer">
-                    </div>
+                <div id="bestNewsListContainer"></div>
             </div>
         </div>
     </div>
@@ -468,12 +592,10 @@
                         <span id="viewCategory">CATEGORIA</span>
                         <div id="viewStaticBombs" style="display:inline-flex; vertical-align: middle;"></div>
                     </div>
-                    
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                         <h2 id="viewTitle" style="margin-bottom:0;">Titolo</h2>
                         <div id="viewInteractiveBombs" class="card-bombs"></div>
                     </div>
-
                     <div id="viewDesc"></div> 
                     <div id="viewImagesContainer"></div>
                     <div class="btn-group admin-only mt-8"><button class="btn btn-text" onclick="switchToEdit()">Modifica News</button></div>
@@ -532,260 +654,97 @@
         let cachedNews = []; 
         let allLives = []; 
         let isAdmin = false;
-        
         let explodedState = {};
+        
+        // NUOVO STATO: 'grid' o 'blog'
+        let currentViewMode = 'grid'; 
 
         const ICON_MOON = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
         const ICON_SUN = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
         const ICON_LOCKED = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
         const ICON_UNLOCKED = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>`;
 
-        function getStaticBombs(level) {
-            const n = parseInt(level) || 1;
-            let html = '';
-            for(let i=0; i<n; i++) {
-                html += `<img src="brick.png" class="static-brick-img" alt="brick">`;
-            }
-            return html;
-        }
-
-        function getInteractiveBombs(newsId) {
-            let html = '';
-            if (!explodedState[newsId]) explodedState[newsId] = [false, false, false];
-            for(let i=0; i<3; i++) {
-                const isExploded = explodedState[newsId][i];
-                const explodedClass = isExploded ? 'exploded' : '';
-                html += `<div class="bomb-container ${explodedClass}" onclick="toggleBomb(event, this, ${newsId}, ${i})">
-                            <img src="brick.png" class="bomb-icon-img" alt="Boom Brick">
-                            <img src="boom.png" class="boom-img" alt="Explosion">
-                         </div>`;
-            }
-            return html;
-        }
-
+        function getStaticBombs(level) { const n = parseInt(level) || 1; let html = ''; for(let i=0; i<n; i++) { html += `<img src="brick.png" class="static-brick-img" alt="brick">`; } return html; }
+        function getInteractiveBombs(newsId) { let html = ''; if (!explodedState[newsId]) explodedState[newsId] = [false, false, false]; for(let i=0; i<3; i++) { const isExploded = explodedState[newsId][i]; const explodedClass = isExploded ? 'exploded' : ''; html += `<div class="bomb-container ${explodedClass}" onclick="toggleBomb(event, this, ${newsId}, ${i})"><img src="brick.png" class="bomb-icon-img" alt="Boom Brick"><img src="boom.png" class="boom-img" alt="Explosion"></div>`; } return html; }
         function showLoader() { document.getElementById('loader').style.display = 'block'; }
         function hideLoader() { document.getElementById('loader').style.display = 'none'; }
-
-        function toggleBomb(e, el, newsId, index) {
-            e.stopPropagation();
-            explodedState[newsId][index] = !explodedState[newsId][index];
-            const isExploded = explodedState[newsId][index];
-            if(isExploded) el.classList.add('exploded'); else el.classList.remove('exploded');
-            if (currentActiveNewsId === newsId) {
-                 const modalBombs = document.getElementById('viewInteractiveBombs');
-                 if(modalBombs) modalBombs.innerHTML = getInteractiveBombs(newsId);
-            }
-            const card = document.querySelector(`.card[data-id="${newsId}"]`);
-            if (card) {
-                const bombContainer = card.querySelector('.card-bombs');
-                if (bombContainer) bombContainer.innerHTML = getInteractiveBombs(newsId);
-            }
-        }
-
-        async function checkSession() {
-            if(!sbClient) return;
-            try {
-                const { data, error } = await sbClient.auth.getSession();
-                if (error) { updateAuthUI(null); } else { updateAuthUI(data.session); }
-                sbClient.auth.onAuthStateChange((event, session) => {
-                    if (event === 'SIGNED_OUT' || event === 'USER_DELETED') updateAuthUI(null);
-                    else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') updateAuthUI(session);
-                });
-            } catch (err) { updateAuthUI(null); }
-        }
-
-        function updateAuthUI(session) {
-            isAdmin = !!session;
-            const authIcon = document.getElementById('authIcon');
-            if (isAdmin) { document.body.classList.add('is-admin'); authIcon.innerHTML = ICON_UNLOCKED; } 
-            else { document.body.classList.remove('is-admin'); authIcon.innerHTML = ICON_LOCKED; }
-            if(activeLiveId) refreshUI();
-        }
-
-        function toggleLogin() {
-            if (isAdmin) {
-                if(confirm("Logout?")) { if(sbClient) sbClient.auth.signOut(); }
-            } else {
-                document.getElementById('loginError').classList.add('hidden');
-                document.getElementById('loginModal').classList.add('active');
-            }
-        }
-
-        async function handleLogin(e) {
-            e.preventDefault(); 
-            if(!sbClient) return alert("Database Disconnesso");
-            const email = document.getElementById('loginEmail').value;
-            const pass = document.getElementById('loginPass').value;
-            const { data, error } = await sbClient.auth.signInWithPassword({ email, password: pass });
-            if (error) {
-                const errorDiv = document.getElementById('loginError');
-                errorDiv.innerText = "Errore: " + error.message; errorDiv.classList.remove('hidden');
-            } else { closeLoginModal(); }
-        }
-        function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
-
-        function initTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            const iconContainer = document.getElementById('darkModeIcon');
-            if (savedTheme === 'dark') { document.body.classList.add('dark-mode'); iconContainer.innerHTML = ICON_SUN; } 
-            else { iconContainer.innerHTML = ICON_MOON; }
-            updateDynamicImages();
-        }
-
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            document.getElementById('darkModeIcon').innerHTML = isDark ? ICON_SUN : ICON_MOON;
-            updateDynamicImages();
-        }
-
-        function updateDynamicImages() {
-            const isDark = document.body.classList.contains('dark-mode');
-            const emptyImg = document.getElementById('emptyStateLogo');
-            const landingImg = document.getElementById('landingLogo');
-            const src = isDark ? 'LOGO-fondo NERO-2026.png' : 'LOGO-fondo BIANCO-2026.png';
-            if(emptyImg) emptyImg.src = src;
-            if(landingImg) landingImg.src = src;
-        }
-
-        function enterApp() {
-            document.getElementById('landingPage').classList.add('hidden');
-            const app = document.getElementById('appContainer');
-            app.style.display = 'flex';
-            setTimeout(() => app.classList.add('visible'), 50);
-            activeLiveId = null;
-            document.getElementById('sidebar').classList.add('collapsed'); 
-            document.getElementById('emptyState').style.display = 'flex';
-            document.getElementById('mainHeader').style.display = 'none';
-            document.getElementById('newsGrid').innerHTML = '';
-        }
-
-        function enterLatestLive() {
-            if (allLives.length > 0) {
-                document.getElementById('landingPage').classList.add('hidden');
-                const app = document.getElementById('appContainer');
-                app.style.display = 'flex';
-                setTimeout(() => app.classList.add('visible'), 50);
-                selectLive(allLives[0]);
-                if(window.innerWidth >= 1024) document.getElementById('sidebar').classList.remove('collapsed');
-            } else { enterApp(); }
-        }
-
-        async function initApp() { 
-            initTheme(); 
-            if(sbClient) { checkSession(); loadLives(); } else { console.warn("Offline Mode"); }
-        }
-
-        function getYoutubeId(url) {
-            if(!url) return null;
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
-        }
-        function openYoutube(e, url) { e.stopPropagation(); if(url) window.open(url, '_blank'); }
-
-        async function loadLives() {
-            if(!sbClient) return;
-            const { data: lives, error } = await sbClient.from('lives').select('*').order('live_date', { ascending: false });
-            if (error) { console.error(error); return; }
-            allLives = lives || [];
-            const list = document.getElementById('liveList');
-            list.innerHTML = '';
-            
-            lives.forEach(live => {
-                const li = document.createElement('li');
-                li.className = `live-item ${live.id === activeLiveId ? 'active' : ''}`;
-                
-                let thumbHTML = '';
-                const ytId = getYoutubeId(live.youtube_link);
-                if(ytId) {
-                    const thumbUrl = `https://img.youtube.com/vi/${ytId}/mqdefault.jpg`;
-                    thumbHTML = `<div class="live-yt-thumb" onclick="openYoutube(event, '${live.youtube_link}')"><img src="${thumbUrl}"></div>`;
-                }
-
-                li.innerHTML = `
-                <div class="live-item-content" onclick="selectLive({id: ${live.id}, name: '${live.name.replace(/'/g, "\\'")}'})">
-                    ${thumbHTML}
-                    <div class="live-info">
-                        <span class="live-name">${live.name}</span>
-                        <span class="live-date">${live.live_date || ''}</span>
-                    </div>
-                </div>
-                <div class="live-actions">
-                    <button class="action-btn admin-only" title="Modifica" onclick="renameLive(event, ${live.id}, '${live.name.replace(/'/g, "\\'")}', '${live.live_date}', '${live.youtube_link || ''}')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                    </button>
-                    <button class="action-btn delete-btn admin-only" title="Elimina" onclick="deleteLive(event, ${live.id})">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                    </button>
-                </div>`;
-                list.appendChild(li);
-            });
-            if(allLives.length > 0) loadLatestLivePreview(allLives[0].id);
-        }
+        function toggleBomb(e, el, newsId, index) { e.stopPropagation(); explodedState[newsId][index] = !explodedState[newsId][index]; const isExploded = explodedState[newsId][index]; if(isExploded) el.classList.add('exploded'); else el.classList.remove('exploded'); if (currentActiveNewsId === newsId) { const modalBombs = document.getElementById('viewInteractiveBombs'); if(modalBombs) modalBombs.innerHTML = getInteractiveBombs(newsId); } const card = document.querySelector(`.card[data-id="${newsId}"]`) || document.querySelector(`.blog-card[data-id="${newsId}"]`); if (card) { const bombContainer = card.querySelector('.card-bombs'); if (bombContainer) bombContainer.innerHTML = getInteractiveBombs(newsId); } }
+        async function checkSession() { if(!sbClient) return; try { const { data, error } = await sbClient.auth.getSession(); if (error) updateAuthUI(null); else updateAuthUI(data.session); sbClient.auth.onAuthStateChange((event, session) => { if (event === 'SIGNED_OUT' || event === 'USER_DELETED') updateAuthUI(null); else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') updateAuthUI(session); }); } catch (err) { updateAuthUI(null); } }
         
-        async function loadLatestLivePreview(liveId) {
-            if(!sbClient || !liveId) return;
-            const { data, error } = await sbClient.from('news').select('cover_image').eq('live_id', liveId).not('cover_image', 'is', null).limit(12);
-            const container = document.getElementById('latestLiveBg');
-            if (container && !error && data && data.length > 0) {
-                container.innerHTML = ''; 
-                data.forEach(item => { const img = document.createElement('img'); img.src = item.cover_image; container.appendChild(img); });
-                container.style.opacity = '1'; 
-            }
+        function updateAuthUI(session) { 
+            isAdmin = !!session; 
+            const authIcon = document.getElementById('authIcon'); 
+            const sidebarTitle = document.getElementById('sidebarTitle');
+
+            if (isAdmin) { 
+                document.body.classList.add('is-admin'); 
+                authIcon.innerHTML = ICON_UNLOCKED; 
+                // Default admin view
+                setAdminMode('management'); 
+            } else { 
+                document.body.classList.remove('is-admin'); 
+                authIcon.innerHTML = ICON_LOCKED; 
+                currentViewMode = 'blog'; // User vede Blog
+                if(sidebarTitle) sidebarTitle.innerText = "Live Utenti";
+            } 
+            if(activeLiveId) refreshUI(); 
         }
 
-        async function createNewLive() {
-            if(!isAdmin) return;
-            const name = prompt("Nome Live:");
-            if(!name) return;
-            const dateStr = prompt("Data Live (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
-            const ytLink = prompt("Link YouTube (Opzionale):");
-            showLoader();
-            const { error } = await sbClient.from('lives').insert([{ name: name, live_date: dateStr, youtube_link: ytLink }]);
-            if(!error) loadLives(); else { alert(error.message); hideLoader(); }
+        function setAdminMode(mode) {
+            currentViewMode = (mode === 'management') ? 'grid' : 'blog';
+            
+            // Aggiorna UI Sidebar
+            document.querySelectorAll('.live-list.admin-only .live-item').forEach(el => el.classList.remove('active'));
+            if(mode === 'management') {
+                document.getElementById('btnAdminMode').classList.add('active');
+                document.getElementById('sidebarTitle').innerText = "Gestione Live";
+            } else {
+                document.getElementById('btnUserMode').classList.add('active');
+                document.getElementById('sidebarTitle').innerText = "Live Utenti (Anteprima)";
+            }
+            refreshUI();
         }
 
-        async function renameLive(e, id, oldName, oldDate, oldLink) {
-            e.stopPropagation(); if(!isAdmin) return;
-            const newName = prompt("Nuovo nome Live:", oldName);
-            const newDate = prompt("Nuova data Live (YYYY-MM-DD):", oldDate);
-            const newLink = prompt("Nuovo Link YouTube:", oldLink);
-            if(newName && newDate) {
-                showLoader();
-                const { error } = await sbClient.from('lives').update({ name: newName, live_date: newDate, youtube_link: newLink }).eq('id', id);
-                if(!error) loadLives(); else { alert(error.message); hideLoader(); }
-            }
-        }
+        function toggleLogin() { if (isAdmin) { if(confirm("Logout?")) if(sbClient) sbClient.auth.signOut(); } else { document.getElementById('loginError').classList.add('hidden'); document.getElementById('loginModal').classList.add('active'); } }
+        async function handleLogin(e) { e.preventDefault(); if(!sbClient) return alert("Database Disconnesso"); const email = document.getElementById('loginEmail').value; const pass = document.getElementById('loginPass').value; const { data, error } = await sbClient.auth.signInWithPassword({ email, password: pass }); if (error) { const errorDiv = document.getElementById('loginError'); errorDiv.innerText = "Errore: " + error.message; errorDiv.classList.remove('hidden'); } else { closeLoginModal(); } }
+        function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
+        function initTheme() { const savedTheme = localStorage.getItem('theme'); const iconContainer = document.getElementById('darkModeIcon'); if (savedTheme === 'dark') { document.body.classList.add('dark-mode'); iconContainer.innerHTML = ICON_SUN; } else { iconContainer.innerHTML = ICON_MOON; } updateDynamicImages(); }
+        function toggleDarkMode() { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('theme', isDark ? 'dark' : 'light'); document.getElementById('darkModeIcon').innerHTML = isDark ? ICON_SUN : ICON_MOON; updateDynamicImages(); }
+        function updateDynamicImages() { const isDark = document.body.classList.contains('dark-mode'); const emptyImg = document.getElementById('emptyStateLogo'); const landingImg = document.getElementById('landingLogo'); const src = isDark ? 'LOGO-fondo NERO-2026.png' : 'LOGO-fondo BIANCO-2026.png'; if(emptyImg) emptyImg.src = src; if(landingImg) landingImg.src = src; }
+        function enterApp() { document.getElementById('landingPage').classList.add('hidden'); const app = document.getElementById('appContainer'); app.style.display = 'flex'; setTimeout(() => app.classList.add('visible'), 50); activeLiveId = null; document.getElementById('sidebar').classList.add('collapsed'); document.getElementById('emptyState').style.display = 'flex'; document.getElementById('mainHeader').style.display = 'none'; document.getElementById('newsGrid').innerHTML = ''; }
+        function enterLatestLive() { if (allLives.length > 0) { document.getElementById('landingPage').classList.add('hidden'); const app = document.getElementById('appContainer'); app.style.display = 'flex'; setTimeout(() => app.classList.add('visible'), 50); selectLive(allLives[0]); if(window.innerWidth >= 1024) document.getElementById('sidebar').classList.remove('collapsed'); } else { enterApp(); } }
+        async function initApp() { initTheme(); if(sbClient) { checkSession(); loadLives(); } else { console.warn("Offline Mode"); } }
+        function getYoutubeId(url) { if(!url) return null; const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/; const match = url.match(regExp); return (match && match[2].length === 11) ? match[2] : null; }
+        function openYoutube(e, url) { e.stopPropagation(); if(url) window.open(url, '_blank'); }
+        async function loadLives() { if(!sbClient) return; const { data: lives, error } = await sbClient.from('lives').select('*').order('live_date', { ascending: false }); if (error) { console.error(error); return; } allLives = lives || []; const list = document.getElementById('liveList'); list.innerHTML = ''; lives.forEach(live => { const li = document.createElement('li'); li.className = `live-item ${live.id === activeLiveId ? 'active' : ''}`; let thumbHTML = ''; const ytId = getYoutubeId(live.youtube_link); if(ytId) { const thumbUrl = `https://img.youtube.com/vi/${ytId}/mqdefault.jpg`; thumbHTML = `<div class="live-yt-thumb" onclick="openYoutube(event, '${live.youtube_link}')"><img src="${thumbUrl}"></div>`; } li.innerHTML = `<div class="live-item-content" onclick="selectLive({id: ${live.id}, name: '${live.name.replace(/'/g, "\\'")}'})">${thumbHTML}<div class="live-info"><span class="live-name">${live.name}</span><span class="live-date">${live.live_date || ''}</span></div></div><div class="live-actions"><button class="action-btn admin-only" title="Modifica" onclick="renameLive(event, ${live.id}, '${live.name.replace(/'/g, "\\'")}', '${live.live_date}', '${live.youtube_link || ''}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button><button class="action-btn delete-btn admin-only" title="Elimina" onclick="deleteLive(event, ${live.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div>`; list.appendChild(li); }); if(allLives.length > 0) loadLatestLivePreview(allLives[0].id); }
+        async function loadLatestLivePreview(liveId) { if(!sbClient || !liveId) return; const { data, error } = await sbClient.from('news').select('cover_image').eq('live_id', liveId).not('cover_image', 'is', null).limit(12); const container = document.getElementById('latestLiveBg'); if (container && !error && data && data.length > 0) { container.innerHTML = ''; data.forEach(item => { const img = document.createElement('img'); img.src = item.cover_image; container.appendChild(img); }); container.style.opacity = '1'; } }
+        async function createNewLive() { if(!isAdmin) return; const name = prompt("Nome Live:"); if(!name) return; const dateStr = prompt("Data Live (YYYY-MM-DD):", new Date().toISOString().split('T')[0]); const ytLink = prompt("Link YouTube (Opzionale):"); showLoader(); const { error } = await sbClient.from('lives').insert([{ name: name, live_date: dateStr, youtube_link: ytLink }]); if(!error) loadLives(); else { alert(error.message); hideLoader(); } }
+        async function renameLive(e, id, oldName, oldDate, oldLink) { e.stopPropagation(); if(!isAdmin) return; const newName = prompt("Nuovo nome Live:", oldName); const newDate = prompt("Nuova data Live (YYYY-MM-DD):", oldDate); const newLink = prompt("Nuovo Link YouTube:", oldLink); if(newName && newDate) { showLoader(); const { error } = await sbClient.from('lives').update({ name: newName, live_date: newDate, youtube_link: newLink }).eq('id', id); if(!error) loadLives(); else { alert(error.message); hideLoader(); } } }
+        async function deleteLive(e, id) { e.stopPropagation(); if(!isAdmin) return; if(confirm("Eliminare live?")) { showLoader(); await sbClient.from('news').delete().eq('live_id', id); await sbClient.from('lives').delete().eq('id', id); if(activeLiveId === id) { activeLiveId = null; document.getElementById('emptyState').style.display = 'flex'; document.getElementById('mainHeader').style.display = 'none'; document.getElementById('newsGrid').innerHTML = ''; } loadLives(); hideLoader(); } }
 
-        async function deleteLive(e, id) {
-            e.stopPropagation(); if(!isAdmin) return;
-            if(confirm("Eliminare live?")) {
-                showLoader();
-                await sbClient.from('news').delete().eq('live_id', id);
-                await sbClient.from('lives').delete().eq('id', id);
-                if(activeLiveId === id) {
-                    activeLiveId = null;
-                    document.getElementById('emptyState').style.display = 'flex';
-                    document.getElementById('mainHeader').style.display = 'none';
-                    document.getElementById('newsGrid').innerHTML = '';
-                }
-                loadLives();
-                hideLoader();
-            }
-        }
+
         function selectLive(live) {
             if(window.innerWidth < 1024) document.getElementById('sidebar').classList.add('collapsed');
+            
             activeLiveId = live.id;
-            document.querySelectorAll('.live-item').forEach(el => el.classList.remove('active'));
-            const items = document.querySelectorAll('.live-item');
-            items.forEach(i => { if(i.innerText.includes(live.name)) i.classList.add('active'); });
+            
+            // Refresh classe active nella lista date
+            document.querySelectorAll('#liveList .live-item').forEach(el => el.classList.remove('active'));
+            const items = document.querySelectorAll('#liveList .live-item');
+            items.forEach(i => {
+                if(i.innerText.includes(live.name)) i.classList.add('active');
+            });
+            
             document.getElementById('emptyState').style.display = 'none';
             document.getElementById('mainHeader').style.display = 'flex';
             document.getElementById('headerTitle').innerText = live.name;
             loadNews(live.id);
         }
+
+        // NUOVA FUNZIONE PER LA VISTA UTENTI (USER-SIDE)
+        // L'utente non ha i tasti "Gestione", quindi non cambia currentViewMode
+        // L'utente vede sempre 'blog'
+
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
 
         async function loadNews(liveId) {
@@ -816,7 +775,13 @@
             renderNavPills(liveCategories);
             if (currentFilter !== 'Tutti' && !liveCategories.has(currentFilter)) currentFilter = 'Tutti';
             updatePillsState();
-            renderGridFromCache();
+            
+            // DECISIONE DI RENDERING
+            if(currentViewMode === 'blog') {
+                renderBlogFromCache();
+            } else {
+                renderGridFromCache();
+            }
         }
 
         function renderNavPills(liveCats) {
@@ -841,8 +806,10 @@
             });
         }
         
+        // RENDER STANDARD (GRIGLIA)
         function renderGridFromCache() {
             const grid = document.getElementById('newsGrid');
+            grid.className = 'grid-container'; // Ripristina classe griglia
             grid.innerHTML = '';
             let filtered = cachedNews;
             if(currentFilter !== 'Tutti') filtered = cachedNews.filter(n => n.category === currentFilter);
@@ -874,7 +841,6 @@
                         </div>`;
                 }
 
-                // Check se votato
                 const hasVoted = localStorage.getItem(`vote_${item.id}`) === 'true';
                 const voteClass = hasVoted ? 'voted' : '';
 
@@ -912,6 +878,67 @@
             });
             grid.appendChild(fragment);
         }
+
+        // NUOVO RENDER (BLOG)
+        function renderBlogFromCache() {
+            const container = document.getElementById('newsGrid');
+            container.className = 'blog-container'; // Cambia classe contenitore
+            container.innerHTML = '';
+            
+            let filtered = cachedNews;
+            if(currentFilter !== 'Tutti') filtered = cachedNews.filter(n => n.category === currentFilter);
+            if (!isAdmin) filtered = filtered.filter(n => n.is_online === true);
+
+            const fragment = document.createDocumentFragment();
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'blog-card'; // Classe stile blog
+                card.dataset.id = item.id;
+                
+                card.onclick = (e) => { 
+                    if(e.target.closest('.admin-toggle-container') || e.target.closest('.bomb-container') || e.target.closest('.trophy-container')) return;
+                    openViewModal(item); 
+                };
+
+                let toggleHTML = '';
+                if (isAdmin) {
+                    toggleHTML = `<div class="admin-toggle-container" onclick="event.stopPropagation()" style="top:10px; right:10px;">
+                            <label class="apple-switch"><input type="checkbox" ${item.is_online ? 'checked' : ''} onchange="toggleNewsStatus(${item.id}, this.checked)"><span class="slider"></span></label>
+                        </div>`;
+                }
+
+                const hasVoted = localStorage.getItem(`vote_${item.id}`) === 'true';
+                const voteClass = hasVoted ? 'voted' : '';
+                const bg = item.cover_image ? item.cover_image : '';
+                
+                // Pulisce la descrizione per l'anteprima
+                let plainText = item.description.replace(/\[\[IMMAGINE \d+\]\]/g, '').replace(/<[^>]*>?/gm, '').trim();
+                if(plainText.length > 120) plainText = plainText.substring(0, 120) + "...";
+
+                card.innerHTML = `
+                    <div class="blog-image-wrapper">
+                        <img src="${bg}" class="blog-image" loading="lazy" alt="${item.title}">
+                        ${toggleHTML}
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-meta-row">
+                            <span class="blog-category">${item.category}</span>
+                            <div class="trophy-container ${voteClass}" onclick="toggleBestNews(event, ${item.id}, this)">
+                                <svg class="trophy-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <h3 class="blog-title">${item.title}</h3>
+                        <div style="margin-bottom: 15px;">${getStaticBombs(item.likelihood)}</div>
+                        <p class="blog-desc">${plainText}</p>
+                        <div class="card-bombs" style="margin-top: auto; padding-top: 10px;">${getInteractiveBombs(item.id)}</div>
+                    </div>
+                `;
+                fragment.appendChild(card);
+            });
+            container.appendChild(fragment);
+        }
         
         function filterNews(cat) { currentFilter = cat; refreshUI(); }
 
@@ -930,7 +957,6 @@
             }
 
             if(!sbClient) return;
-            // Optimistic update su DB (lettura + scrittura)
             const { data, error } = await sbClient.from('news').select('votes').eq('id', newsId).single();
             if(!error) {
                 const current = data.votes || 0;
@@ -942,7 +968,6 @@
         async function openBestNewsModal() {
             if(!sbClient) return;
             showLoader();
-            // Fetch top 50 news ordinate per voti
             const { data: bestNews, error } = await sbClient
                 .from('news')
                 .select('id, title, cover_image, votes, live_id')
@@ -957,7 +982,6 @@
             if(!bestNews || bestNews.length === 0) {
                 container.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-sec);">Nessuna news votata ancora!</div>';
             } else {
-                // Recuperiamo info live per mostrare il nome live
                 const liveMap = {};
                 if(allLives.length > 0) allLives.forEach(l => liveMap[l.id] = l.name);
 
@@ -1005,6 +1029,16 @@
             document.getElementById('editMode').classList.add('hidden');
             document.getElementById('modalOverlay').classList.add('active');
             
+            // MODIFICA: Se è modalità Blog, apri modal fullscreen e usa selettore corretto
+            const modalMainCard = document.querySelector('#modalOverlay .modal-card'); 
+            if(currentViewMode === 'blog') {
+                document.getElementById('modalOverlay').classList.add('fullscreen-mode');
+                modalMainCard.classList.add('fullscreen');
+            } else {
+                document.getElementById('modalOverlay').classList.remove('fullscreen-mode');
+                modalMainCard.classList.remove('fullscreen');
+            }
+
             const { data: fullItem, error } = await sbClient.from('news').select('body_images').eq('id', partialItem.id).single();
             if (!error && fullItem) {
                 currentViewImages = fullItem.body_images || [];
