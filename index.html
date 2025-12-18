@@ -218,17 +218,18 @@
         .btn-add-news { background-color: var(--text-main); color: var(--bg-body); border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s; margin-left: auto; }
         .btn-add-news:hover { transform: scale(1.05); }
 
-        /* STICKY FILTER CONTAINER (MODIFICATO: Fuori dall'header) */
+        /* STICKY FILTER CONTAINER */
         .sticky-filter-container {
             position: sticky;
             top: 0;
             z-index: 50;
-            background-color: rgba(245, 245, 247, 0.90); /* Colore sfondo body con alpha */
+            background-color: rgba(245, 245, 247, 0.90); 
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             width: 100%;
             padding: 10px 0 15px 0;
             margin-bottom: 20px;
+            margin-top: -20px; 
         }
         body.dark-mode .sticky-filter-container {
             background-color: rgba(0, 0, 0, 0.85);
@@ -296,7 +297,7 @@
         .card-title { font-size: 20px; font-weight: 700; margin: 0; line-height: 1.35; color: var(--text-main); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; letter-spacing: -0.3px; }
 
 
-        /* --- NUOVA VISTA: BLOG UTENTI --- */
+        /* --- VISTA BLOG (ORIZZONTALE) --- */
         .blog-container { display: flex; flex-direction: column; gap: 24px; max-width: 800px; margin: 0 auto; padding-bottom: 40px; }
         .blog-card {
             display: flex; gap: 24px;
@@ -419,15 +420,42 @@
                         <div class="space-y-3 text-left">
                             <div class="flex gap-3 items-start">
                                 <div><img src="brick.png" class="bomb-icon-img" alt="brick"></div>
-                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Due mondi, una passione:</strong> Esplora le ultime News o immergiti nelle Ideas più creative.</p>
+                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Divertiti con noi:</strong> fai scoppiare i mattoncini nelle news ed assegna il tuo personale valore di "BOOM".</p>
                             </div>
+                            
                             <div class="flex gap-3 items-start">
                                 <div class="text-slate-900"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg></div>
-                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Hall of Fame:</strong> Vota i contenuti migliori e scopri la classifica.</p>
+                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Hall of Fame:</strong> Vota le migliori news e scopri la classifica.</p>
+                            </div>
+
+                            <div class="flex gap-3 items-start">
+                                <div class="text-slate-900">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="m21 16-4 4-4-4"></path><path d="M17 20V4"></path><path d="m3 8 4-4 4 4"></path><path d="M7 4v16"></path>
+                                    </svg>
+                                </div>
+                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Organizza il tuo flusso:</strong> Tieni premuto e trascina le schede per riordinare il feed.</p>
+                            </div>
+                            <div class="flex gap-3 items-start">
+                                <div class="text-slate-900">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Niente Spoiler Visivi:</strong> Immagini sfocate di default. Passa con il mouse sopra per vederle nitide.</p>
+                            </div>
+                            <div class="flex gap-3 items-start">
+                                <div class="text-slate-900">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+                                    </svg>
+                                </div>
+                                <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">YouTube Link:</strong> Accedi al video della live direttamente dal menu laterale.</p>
                             </div>
                         </div>
                     </div>
                 </div>
+                
                 <div onclick="enterLatestLive()" class="landing-box col-span-1 bg-gradient-to-b from-slate-900 to-slate-800 text-white p-6 md:p-8 rounded-[28px] relative overflow-hidden group cursor-pointer min-h-[220px] flex flex-col justify-between live-box">
                     <div class="absolute top-0 right-0 w-64 h-64 bg-purple-500 rounded-full filter blur-[80px] opacity-30 group-hover:opacity-50 transition"></div>
                     <div class="flex justify-between items-start relative z-10">
@@ -510,6 +538,7 @@
                 </button>
                 <button class="icon-btn" onclick="toggleLogin()" title="Admin Login" style="margin-left: auto;"><span id="authIcon" style="display: flex; align-items: center; justify-content: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span></button>
             </div>
+            
             <header class="main-header" id="mainHeader" style="display:none;">
                 <div class="header-top-row">
                     <div class="header-title-group">
@@ -518,10 +547,12 @@
                     </div>
                     <button id="btnMainAddNews" class="btn-add-news admin-only" onclick="openEditModal()">+</button>
                 </div>
-                <div id="stickyFilterContainer" class="sticky-filter-container" style="display:none;">
-                    <div class="nav-pills" id="navPillsContainer"></div>
-                </div>
             </header>
+
+            <div id="stickyFilterContainer" class="sticky-filter-container" style="display:none;">
+                <div class="nav-pills" id="navPillsContainer"></div>
+            </div>
+
             <div id="emptyState" class="empty-state">
                 <div id="latestLiveBg"></div>
                 <div style="position: relative; width: 208px; height: 208px; margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center;">
@@ -644,6 +675,8 @@
         let cachedNews = []; 
         let allLives = []; 
         let explodedState = {};
+        let allVotedNews = [];
+        let currentHoFType = 'news';
         
         // STATO ADMIN
         let isAdmin = false;
@@ -668,7 +701,6 @@
             userRole = null;
 
             if (isAdmin && session.user) {
-                // --- MODIFICA MANUALE QUI ---
                 // Se l'email è quella specifica, forza il ruolo "ideas_editor"
                 if (session.user.email === 'dreamnbricks@gmail.com') {
                     userRole = 'ideas_editor';
@@ -676,7 +708,6 @@
                     // Per tutti gli altri admin (es. te), assegna superadmin
                     userRole = 'superadmin'; 
                 }
-                // -----------------------------
             }
             
             const authIcon = document.getElementById('authIcon'); 
@@ -701,6 +732,7 @@
             } else { 
                 document.body.classList.remove('is-admin'); 
                 authIcon.innerHTML = ICON_LOCKED; 
+                // MODIFICA: La vista di default è BLOG per gli utenti
                 currentViewMode = 'blog'; 
                 userModeList.style.display = 'block';
                 userModeSection.style.display = 'flex';
@@ -714,7 +746,9 @@
         }
 
         function setAdminMode(mode) {
+            // MODIFICA: Admin Management -> Grid, Admin User View -> Blog
             currentViewMode = (mode === 'management') ? 'grid' : 'blog';
+            
             document.querySelectorAll('.live-list.admin-only .live-item').forEach(el => el.classList.remove('active'));
             if(mode === 'management') {
                 document.getElementById('btnAdminMode').classList.add('active');
@@ -762,6 +796,7 @@
             listIdeas.innerHTML = '';
 
             lives.forEach(live => { 
+                // Default type 'news' se null
                 const type = live.type || 'news';
                 const li = document.createElement('li'); 
                 li.className = `live-item ${live.id === activeLiveId ? 'active' : ''}`; 
@@ -857,6 +892,8 @@
 
         function switchToUserMode() {
             if(window.innerWidth < 1024) document.getElementById('sidebar').classList.add('collapsed');
+            
+            // MODIFICA: Vista BLOG per user
             currentViewMode = 'blog';
             
             document.getElementById('sidebar').classList.add('locked');
@@ -908,6 +945,7 @@
             if (currentFilter !== 'Tutti' && !liveCategories.has(currentFilter)) currentFilter = 'Tutti';
             updatePillsState();
             
+            // RIPRISTINATO: Scelta condizionale del rendering
             if(currentViewMode === 'blog') {
                 renderBlogFromCache();
             } else {
@@ -1110,41 +1148,79 @@
                 .select('id, title, cover_image, votes, live_id')
                 .gt('votes', 0)
                 .order('votes', { ascending: false })
-                .limit(50);
+                .limit(100);
             
             hideLoader();
             if(error) return alert("Errore caricamento classifica");
+            
+            allVotedNews = bestNews || [];
+            currentHoFType = activeLiveType || 'news';
 
             const container = document.getElementById('bestNewsListContainer');
-            if(!bestNews || bestNews.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-sec);">Nessuna news votata ancora!</div>';
-            } else {
-                const liveMap = {};
-                if(allLives.length > 0) allLives.forEach(l => liveMap[l.id] = l.name);
-
-                let html = '<ul class="ranking-list">';
-                bestNews.forEach((news, index) => {
-                   const liveName = liveMap[news.live_id] || 'Live passata';
-                   const thumb = news.cover_image || 'brick.png';
-                   html += `
-                    <li class="ranking-item">
-                        <div class="ranking-pos">${index + 1}</div>
-                        <img src="${thumb}" class="ranking-thumb" alt="thumb">
-                        <div class="ranking-info">
-                            <div class="ranking-title">${news.title}</div>
-                            <div class="ranking-live">${liveName}</div>
-                        </div>
-                        <div class="ranking-votes">
-                            <span class="vote-number">${news.votes}</span>
-                            <span class="vote-label">Voti</span>
-                        </div>
-                    </li>`;
-                });
-                html += '</ul>';
-                container.innerHTML = html;
-            }
+            // Init Structure
+            container.innerHTML = `
+                <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+                    <div class="nav-pills" style="width: auto;">
+                        <div class="nav-item ${currentHoFType === 'news' ? 'active' : ''}" onclick="switchHoF('news')">News</div>
+                        <div class="nav-item ${currentHoFType === 'ideas' ? 'active' : ''}" onclick="switchHoF('ideas')">Ideas</div>
+                    </div>
+                </div>
+                <div id="hofListContent"></div>
+            `;
+            
+            switchHoF(currentHoFType);
             document.getElementById('bestNewsModal').classList.add('active');
         }
+
+        function switchHoF(type) {
+            currentHoFType = type;
+            // Update tabs
+            const tabs = document.querySelectorAll('#bestNewsListContainer .nav-item');
+            tabs.forEach(t => {
+                if(t.innerText.toLowerCase() === type) t.classList.add('active');
+                else t.classList.remove('active');
+            });
+
+            const listContainer = document.getElementById('hofListContent');
+            
+            const liveTypeMap = {};
+            allLives.forEach(l => liveTypeMap[l.id] = (l.type || 'news')); 
+
+            const filtered = allVotedNews.filter(n => {
+                const lType = liveTypeMap[n.live_id] || 'news'; 
+                return lType === type;
+            });
+
+            if(filtered.length === 0) {
+                listContainer.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-sec);">Nessuna classifica per questa categoria.</div>';
+                return;
+            }
+
+            const liveNameMap = {};
+            allLives.forEach(l => liveNameMap[l.id] = l.name);
+
+            let html = '<ul class="ranking-list">';
+            filtered.forEach((news, index) => {
+                const liveName = liveNameMap[news.live_id] || 'Live passata';
+                const thumb = news.cover_image || 'brick.png';
+                html += `
+                <li class="ranking-item">
+                    <div class="ranking-pos">${index + 1}</div>
+                    <img src="${thumb}" class="ranking-thumb" alt="thumb">
+                    <div class="ranking-info">
+                        <div class="ranking-title">${news.title}</div>
+                        <div class="ranking-live">${liveName}</div>
+                    </div>
+                    <div class="ranking-votes">
+                        <span class="vote-number">${news.votes}</span>
+                        <span class="vote-label">Voti</span>
+                    </div>
+                </li>`;
+            });
+            html += '</ul>';
+            listContainer.innerHTML = html;
+        }
+
         function closeBestNewsModal() { document.getElementById('bestNewsModal').classList.remove('active'); }
 
 
@@ -1175,7 +1251,6 @@
                 modalMainCard.classList.remove('fullscreen');
             }
 
-            // GESTIONE VISIBILITÀ TASTO MODIFICA NEL MODAL
             const btnEditContainer = document.getElementById('btnEditNewsContainer');
             if (isAdmin) {
                 if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') {
@@ -1211,7 +1286,6 @@
 
         async function openEditModal(id = null) {
             if(!isAdmin) return;
-            // Doppio controllo permesso (nel caso chiamino la funzione da console)
             if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') return alert("Non hai i permessi per modificare News.");
 
             tempCoverImage = ''; tempBodyImages = [];
@@ -1257,8 +1331,6 @@
 
         async function saveNews() {
             if(!activeLiveId || !isAdmin) return;
-            
-            // Controllo permessi salvataggio
             if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') return alert("Permesso negato");
 
             const idInput = document.getElementById('editId').value;
