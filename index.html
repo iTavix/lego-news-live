@@ -90,7 +90,9 @@
                     <div><h3 class="text-lg font-bold">Navigazione & Archivi</h3><p class="text-slate-500 text-sm">Usa il menu per accedere allo storico delle Live.</p></div>
                 </div>
             </div>
-            <footer class="mt-8 text-center text-slate-400 text-sm pb-8">&copy; 2026 Progettato pe la Community 2PPL </footer>
+            <footer class="mt-8 text-center text-slate-400 text-sm pb-8 flex items-center justify-center gap-2">
+                &copy; 2026 Progettato pe la Community 2PPL by <img src="logo_itavix.png" alt="Itavix" style="height: 20px; width: auto; vertical-align: middle;">
+            </footer>
         </main>
     </div>
 
@@ -155,7 +157,10 @@
                 <div class="header-top-row">
                     <div class="header-title-group">
                         <h1 id="headerTitle">Titolo Live</h1>
-                        <div class="logo-container"><img src="LOGO-fondo BIANCO-2026.png" alt="Logo 2PPL" class="header-logo" onerror="this.style.display='none'"></div>
+                        <div class="logo-container">
+                            <img src="LOGO-fondo BIANCO-2026.png" alt="Logo 2PPL" class="header-logo" onerror="this.style.display='none'">
+                            <img id="secondaryLogo" src="" alt="Partner Logo" class="header-logo" style="display:none">
+                        </div>
                     </div>
                     <button id="btnMainAddNews" class="btn-add-news admin-only" onclick="openEditModal()">+</button>
                 </div>

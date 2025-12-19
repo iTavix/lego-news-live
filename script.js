@@ -221,6 +221,17 @@ function selectLive(live) {
     document.getElementById('headerTitle').innerText = live.name;
     document.getElementById('stickyFilterContainer').style.display = 'block';
 
+    // MODIFICA: Gestione loghi header
+    const secondaryLogo = document.getElementById('secondaryLogo');
+    if (secondaryLogo) {
+        secondaryLogo.style.display = 'block';
+        if (activeLiveType === 'ideas') {
+            secondaryLogo.src = 'logo_dream.jpg';
+        } else {
+            secondaryLogo.src = 'logo_itavix.png';
+        }
+    }
+
     const addBtn = document.getElementById('btnMainAddNews');
     if (isAdmin) {
         if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') {
@@ -249,6 +260,11 @@ function switchToUserMode() {
     document.getElementById('headerTitle').innerText = "Live Utenti";
     document.getElementById('stickyFilterContainer').style.display = 'block';
     document.getElementById('btnMainAddNews').style.display = 'none'; 
+
+    // Nascondi logo secondario in modalità utente/generica se necessario, 
+    // oppure mantieni l'ultimo impostato. Per sicurezza lo nascondiamo o lasciamo default.
+    const secondaryLogo = document.getElementById('secondaryLogo');
+    if(secondaryLogo) secondaryLogo.style.display = 'none';
 
     if(allLives.length > 0) {
         activeLiveId = allLives[0].id;
