@@ -8,13 +8,15 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.9/purify.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="text-slate-900">
 
-    <div id="loader" class="loader">Caricamento...</div>
+    <div id="loader" class="loader">Operazione in corso...</div>
+    <div id="toastContainer" class="toast-container"></div>
 
     <div id="landingPage">
         <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
@@ -31,51 +33,45 @@
             </header>
             
             <div class="grid grid-cols-1 landscape:grid-cols-2 md:grid-cols-3 gap-5 w-full max-w-5xl mx-auto pb-12">
-                <div onclick="enterApp()" class="landing-box col-span-1 landscape:col-span-2 md:col-span-2 p-6 md:p-8 rounded-[28px] relative overflow-hidden group cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="absolute bottom-5 right-5 w-40 h-40 opacity-20 text-blue-600 rotate-12 z-0 pointer-events-none mix-blend-overlay">
-                      <path fill-rule="evenodd" d="M4.125 3C3.089 3 2.25 3.84 2.25 4.875V18a3 3 0 0 0 3 3h15a3 3 0 0 1-3-3V4.875C17.25 3.84 16.411 3 15.375 3H4.125ZM12 9.75a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H12Zm-.75-2.25a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 0 1.5H12a.75.75 0 0 1-.75-.75ZM6 12.75a.75.75 0 0 0 0 1.5h7.5a.75.75 0 0 0 0-1.5H6Zm-.75 3.75a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5H6a.75.75 0 0 1-.75-.75ZM6 6.75a.75.75 0 0 0-.75.75v3c0 .414.336.75.75.75h3a.75.75 0 0 0 .75-.75v-3A.75.75 0 0 0 9 6.75H6Z" clip-rule="evenodd" />
-                      <path d="M18.75 6.75h1.875c.621 0 1.125.504 1.125 1.125V18a1.5 1.5 0 0 1-3 0V6.75Z" />
-                    </svg>
+                <div onclick="enterApp()" class="landing-card news-card-solid col-span-1 landscape:col-span-2 md:col-span-2 p-6 md:p-8 rounded-[28px] relative overflow-hidden group cursor-pointer">
+                    <div class="news-overlay-icon">
+                        <svg class="news-overlay-svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H5v-2h9v2zm5-4H5v-2h14v2zm0-4H5V7h14v2z"/>
+                        </svg>
+                    </div>
 
                     <div class="relative z-10">
-                        <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><circle cx="7" cy="7" r="2.5"></circle><circle cx="17" cy="7" r="2.5"></circle><circle cx="7" cy="17" r="2.5"></circle><circle cx="17" cy="17" r="2.5"></circle></svg>
-                        </div>
-                        <h3 class="text-2xl font-bold mb-4">Consulta News & Ideas</h3>
-                        
-                        <div class="space-y-3 text-left">
+                        <h3 class="text-2xl font-bold mb-4">Consulta tutte le news</h3>
+                        <div class="space-y-4 text-left">
                             <div class="flex gap-3 items-start">
-                                <div><img src="brick.png" class="bomb-icon-img" alt="brick"></div>
+                                <div class="shrink-0"><img src="brick.png" class="bomb-icon-img" alt="brick"></div>
                                 <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Divertiti con noi:</strong> fai scoppiare i mattoncini nelle news ed assegna il tuo personale valore di "BOOM".</p>
                             </div>
                             <div class="flex gap-3 items-start">
-                                <div class="text-slate-900"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg></div>
+                                <div class="text-slate-900 shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg></div>
                                 <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Hall of Fame:</strong> Vota le migliori news e scopri la classifica.</p>
                             </div>
                             <div class="flex gap-3 items-start">
-                                <div class="text-slate-900"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"></path><path d="M17 20V4"></path><path d="m3 8 4-4 4 4"></path><path d="M7 4v16"></path></svg></div>
+                                <div class="text-slate-900 shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M19 9l3 3-3 3M15 19l-3 3-3-3M2 12h20M12 2v20"></path></svg></div>
                                 <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Organizza il tuo flusso:</strong> Tieni premuto e trascina le schede per riordinare il feed.</p>
                             </div>
                             <div class="flex gap-3 items-start">
-                                <div class="text-slate-900"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg></div>
+                                <div class="text-slate-900 shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg></div>
                                 <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">Niente Spoiler Visivi:</strong> Immagini sfocate di default. Passa con il mouse sopra per vederle nitide.</p>
                             </div>
                             <div class="flex gap-3 items-start">
-                                <div class="text-slate-900"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg></div>
+                                <div class="text-slate-900 shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg></div>
                                 <p class="text-slate-600 text-sm leading-relaxed"><strong class="text-slate-900">YouTube Link:</strong> Accedi al video della live direttamente dal menu laterale.</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <div onclick="enterLatestLive()" class="landing-box col-span-1 bg-gradient-to-b from-slate-900 to-slate-800 text-white p-6 md:p-8 rounded-[28px] relative overflow-hidden group cursor-pointer min-h-[220px] flex flex-col justify-between live-box">
+                <div onclick="enterLatestLive()" class="landing-card col-span-1 bg-gradient-to-b from-slate-900 to-slate-800 text-white p-6 md:p-8 rounded-[28px] relative overflow-hidden group cursor-pointer min-h-[220px] flex flex-col justify-between live-box">
                     <div class="absolute top-0 right-0 w-64 h-64 bg-purple-500 rounded-full filter blur-[80px] opacity-30 group-hover:opacity-50 transition"></div>
                     <div class="flex justify-between items-start relative z-10">
                         <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="m22 8-6 4 6 4V8Z"></path>
-                                <rect width="14" height="12" x="2" y="6" rx="2" ry="2"></rect>
-                            </svg>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"></path><rect width="14" height="12" x="2" y="6" rx="2" ry="2"></rect></svg>
                         </div>
                         <span class="bg-red-500/20 text-red-300 text-xs font-bold px-3 py-1 rounded-full border border-red-500/30 flex items-center gap-2"><span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> LIVE</span>
                     </div>
@@ -83,16 +79,14 @@
                     
                     <div class="relative z-10 mt-4"><h3 class="text-2xl font-bold mb-1">Ultima News Live</h3><p class="text-slate-300 text-sm">Accedi subito.</p></div>
                 </div>
-                <div class="landing-box col-span-1 landscape:col-span-1 md:col-span-3 bg-white/60 backdrop-blur-xl p-6 rounded-[28px] flex items-center gap-5">
+                <div class="landing-card col-span-1 landscape:col-span-1 md:col-span-3 bg-white/60 backdrop-blur-xl p-6 rounded-[28px] flex items-center gap-5">
                      <div class="shrink-0 w-14 h-14 bg-green-100 rounded-full flex items-center justify-center text-green-600">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><circle cx="7" cy="7" r="2.5"></circle><circle cx="17" cy="7" r="2.5"></circle><circle cx="7" cy="17" r="2.5"></circle><circle cx="17" cy="17" r="2.5"></circle></svg>
                     </div>
                     <div><h3 class="text-lg font-bold">Navigazione & Archivi</h3><p class="text-slate-500 text-sm">Usa il menu per accedere allo storico delle Live.</p></div>
                 </div>
             </div>
-            <footer class="mt-8 text-center text-slate-400 text-sm pb-8 flex items-center justify-center gap-2">
-                &copy; 2026 Progettato pe la Community 2PPL by <img src="logo_itavix.png" alt="Itavix" style="height: 20px; width: auto; vertical-align: middle;">
-            </footer>
+            <footer class="mt-8 text-center text-slate-400 text-sm pb-8 flex items-center justify-center gap-2">&copy; 2026 2PPL</footer>
         </main>
     </div>
 
@@ -103,42 +97,24 @@
                 <button class="add-live-btn admin-only" id="btnAddNewsLive" onclick="createNewLive('news')">+</button>
             </div>
             <ul class="live-list" id="liveListNews"></ul>
-
             <div class="sidebar-header" style="margin-top: 10px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 20px;">
                 <h2 class="sidebar-title">Ideas Live</h2>
                 <button class="add-live-btn admin-only" id="btnAddIdeasLive" onclick="createNewLive('ideas')">+</button>
             </div>
             <ul class="live-list" id="liveListIdeas"></ul>
-
             <div class="sidebar-header mt-8 admin-only" style="border-top: 1px solid rgba(0,0,0,0.05); padding-top: 20px;"><h2 class="sidebar-title" style="font-size: 16px; color: var(--text-sec);">Modalità</h2></div>
             <ul class="live-list admin-only">
                 <li class="live-item active" id="btnAdminMode" onclick="setAdminMode('management')">
-                    <div class="live-item-content">
-                        <div style="width:32px; height:32px; background:rgba(0,122,255,0.1); border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--accent);">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
-                        </div>
-                        <div class="live-info"><span class="live-name">Gestione</span></div>
-                    </div>
+                    <div class="live-item-content"><div style="width:32px; height:32px; background:rgba(0,122,255,0.1); border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--accent);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg></div><div class="live-info"><span class="live-name">Gestione</span></div></div>
                 </li>
                 <li class="live-item" id="btnUserMode" onclick="setAdminMode('user')">
-                    <div class="live-item-content">
-                        <div style="width:32px; height:32px; background:rgba(52,199,89,0.1); border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--success);">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                        </div>
-                        <div class="live-info"><span class="live-name">Vista Utente</span></div>
-                    </div>
+                    <div class="live-item-content"><div style="width:32px; height:32px; background:rgba(52,199,89,0.1); border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--success);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div><div class="live-info"><span class="live-name">Vista Utente</span></div></div>
                 </li>
             </ul>
-
             <div class="sidebar-header mt-8" id="userModeSection" style="display:none; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 20px;"><h2 class="sidebar-title" style="font-size: 16px; color: var(--text-sec);">Community</h2></div>
             <ul class="live-list" id="userModeList" style="display:none;">
                 <li class="live-item active" id="btnUserLive" onclick="switchToUserMode()">
-                    <div class="live-item-content">
-                        <div style="width:32px; height:32px; background:rgba(0,122,255,0.1); border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--accent);">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                        </div>
-                        <div class="live-info"><span class="live-name">Live Utenti</span></div>
-                    </div>
+                    <div class="live-item-content"><div style="width:32px; height:32px; background:rgba(0,122,255,0.1); border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--accent);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div><div class="live-info"><span class="live-name">Live Utenti</span></div></div>
                 </li>
             </ul>
         </aside>
@@ -147,9 +123,7 @@
             <div class="top-bar-controls">
                 <button class="icon-btn" onclick="toggleSidebar()" title="Menu"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
                 <button class="icon-btn" onclick="toggleDarkMode()" title="Dark Mode"><span id="darkModeIcon" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;"></span></button>
-                <button class="icon-btn gold-btn" onclick="openBestNewsModal()" title="Classifica Migliori News">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
-                </button>
+                <button class="icon-btn gold-btn" onclick="openBestNewsModal()" title="Classifica Migliori News"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg></button>
                 <button class="icon-btn" onclick="toggleLogin()" title="Admin Login" style="margin-left: auto;"><span id="authIcon" style="display: flex; align-items: center; justify-content: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span></button>
             </div>
             
@@ -167,7 +141,13 @@
             </header>
 
             <div id="stickyFilterContainer" class="sticky-filter-container" style="display:none;">
-                <div class="nav-pills" id="navPillsContainer"></div>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <div class="search-container">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Cerca news..." onkeyup="handleSearch(this.value)">
+                    </div>
+                    <div class="nav-pills" id="navPillsContainer"></div>
+                </div>
             </div>
 
             <div id="emptyState" class="empty-state">
@@ -178,7 +158,6 @@
                 </div>
                 <h1 class="text-4xl font-black tracking-tighter text-slate-900 mb-1" style="position: relative; z-index: 10; font-family: 'Inter', sans-serif;">NEWS & IDEAS</h1>
                 <h3 class="text-xl font-bold mt-10" style="position: relative; z-index: 10;">Nessuna Live Selezionata</h3>
-                <p class="text-slate-500 mt-2" style="position: relative; z-index: 10;">Apri il menu per scegliere cosa guardare.</p>
                 <button onclick="toggleSidebar()" class="mt-6 bg-slate-200 text-slate-800 px-6 py-3 rounded-xl font-bold" style="position: relative; z-index: 10;">Apri Menu</button>
             </div>
             
@@ -236,19 +215,58 @@
                     <div class="btn-group admin-only mt-8" id="btnEditNewsContainer"><button class="btn btn-text" onclick="switchToEdit()">Modifica Elemento</button></div>
                 </div>
             </div>
-            <div id="editMode" class="hidden modal-scrollable">
-                <button class="close-btn" onclick="closeModal()" style="background:rgba(0,0,0,0.5);color:white;">✕</button>
-                <div style="padding: 30px 20px;">
-                    <h2 style="margin-top:0; margin-bottom:20px;">Modifica Elemento</h2>
+            
+            <div id="editMode" class="hidden modal-scrollable" style="background: var(--bg-input);">
+                <button class="close-btn" onclick="closeModal()" style="background:rgba(0,0,0,0.1);color:var(--text-main);">✕</button>
+                <div style="padding: 20px 20px 40px 20px;">
+                    <h2 style="margin-top:40px; margin-bottom:20px; font-weight:800; font-size:28px;">Modifica Elemento</h2>
                     <input type="hidden" id="editId">
-                    <div class="form-group"><label class="form-label">Titolo</label><input type="text" id="editTitle" class="form-input"></div>
-                    <div style="display: flex; gap: 15px; flex-wrap:wrap;">
-                        <div class="form-group" style="flex: 1; min-width:150px;"><label class="form-label">Categoria</label><input type="text" id="editCategory" class="form-input" list="categoryOptions"></div>
-                        <div class="form-group" style="flex: 1; min-width:150px;"><label class="form-label">Affidabilità</label><select id="editLikelihood" class="form-select"><option value="1">💣 Probabile</option><option value="2">💣💣 Molto</option><option value="3">💣💣💣 Sicuro</option></select></div>
+                    
+                    <div class="ios-form-container">
+                        <div class="ios-group">
+                            <div class="ios-row">
+                                <label class="ios-label">Titolo</label>
+                                <input type="text" id="editTitle" class="ios-input" placeholder="Titolo News">
+                            </div>
+                            <div class="ios-row">
+                                <label class="ios-label">Categoria</label>
+                                <input type="text" id="editCategory" class="ios-input" list="categoryOptions" placeholder="Scegli...">
+                            </div>
+                            <div class="ios-row">
+                                <label class="ios-label">Livello</label>
+                                <select id="editLikelihood" class="ios-select">
+                                    <option value="1">💣 Probabile</option>
+                                    <option value="2">💣💣 Molto</option>
+                                    <option value="3">💣💣💣 Sicuro</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="ios-group">
+                            <div class="ios-row" onclick="document.getElementById('fileInputCover').click()">
+                                <label class="ios-label" style="flex:1">Copertina</label>
+                                <span class="upload-placeholder-text" id="uploadPlaceholder">Carica</span>
+                                <input type="file" id="fileInputCover" accept="image/*" style="display: none;" onchange="handleCoverUpload(this)">
+                                <img id="previewImg" class="ios-preview-thumb" style="display:none">
+                            </div>
+                            <div class="ios-row" onclick="document.getElementById('fileInputBody').click()">
+                                <label class="ios-label" style="flex:1; color:var(--accent);">Agg. Foto Corpo</label>
+                                <input type="file" id="fileInputBody" accept="image/*" multiple style="display: none;" onchange="handleBodyImageUpload(this)">
+                            </div>
+                        </div>
+
+                        <div class="ios-group">
+                            <div class="ios-row" style="height:auto; min-height:150px; align-items:flex-start;">
+                                <textarea id="editDesc" class="ios-textarea" placeholder="Descrizione news..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="ios-actions">
+                            <button class="ios-btn ios-btn-danger" onclick="deleteCurrentNews()" id="btnDelete">Elimina</button>
+                            <button class="ios-btn ios-btn-primary" onclick="saveNews()">Salva</button>
+                        </div>
                     </div>
-                    <div class="form-group"><label class="form-label">Copertina</label><div class="upload-box" onclick="document.getElementById('fileInputCover').click()"><input type="file" id="fileInputCover" accept="image/*" style="display: none;" onchange="handleCoverUpload(this)"><div id="uploadPlaceholder">Carica Immagine</div><img id="previewImg" class="upload-preview"></div></div>
-                    <div class="form-group"><label class="form-label">Descrizione</label><button type="button" class="btn-insert-img" onclick="document.getElementById('fileInputBody').click()">Agg. Foto Corpo</button><input type="file" id="fileInputBody" accept="image/*" multiple style="display: none;" onchange="handleBodyImageUpload(this)"><textarea id="editDesc" class="form-textarea" style="min-height: 200px;"></textarea></div>
-                    <div class="btn-group"><button class="btn btn-danger" onclick="deleteCurrentNews()" id="btnDelete">Elimina</button><button class="btn btn-primary" onclick="saveNews()">Salva</button></div>
+                    
                     <datalist id="categoryOptions"></datalist>
                 </div>
             </div>

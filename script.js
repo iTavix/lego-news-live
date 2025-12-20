@@ -24,15 +24,19 @@ let dragSrcEl = null;
 let allCategories = new Set(['Star Wars', 'Harry Potter', 'City', 'Altro', 'Marvel', 'DC', 'Technic', 'Ideas']);
 let cachedNews = []; 
 let allLives = []; 
-let explodedState = {};
+
+// PERSISTENZA BOOM
+let explodedState = JSON.parse(localStorage.getItem('explodedState')) || {};
+
 let allVotedNews = [];
 let currentHoFType = 'news';
+let currentSearchTerm = ''; 
 
 // STATO ADMIN
 let isAdmin = false;
 let userRole = null; 
 
-// Vista default: 'blog' per utenti, 'grid' per admin. Inizializzato dopo login check.
+// Vista default
 let currentViewMode = 'blog'; 
 
 const ICON_MOON = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
@@ -40,23 +44,117 @@ const ICON_SUN = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" st
 const ICON_LOCKED = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
 const ICON_UNLOCKED = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>`;
 
-function getStaticBombs(level) { const n = parseInt(level) || 1; let html = ''; for(let i=0; i<n; i++) { html += `<img src="brick.png" class="static-brick-img" alt="brick">`; } return html; }
-function getInteractiveBombs(newsId) { let html = ''; if (!explodedState[newsId]) explodedState[newsId] = [false, false, false]; for(let i=0; i<3; i++) { const isExploded = explodedState[newsId][i]; const explodedClass = isExploded ? 'exploded' : ''; html += `<div class="bomb-container ${explodedClass}" onclick="toggleBomb(event, this, ${newsId}, ${i})"><img src="brick.png" class="bomb-icon-img" alt="Boom Brick"><img src="boom.png" class="boom-img" alt="Explosion"></div>`; } return html; }
+// HELPER DOM - Sicurezza XSS & Performance
+function createElement(tag, className, text) {
+    const el = document.createElement(tag);
+    if (className) el.className = className;
+    if (text) el.textContent = text;
+    return el;
+}
+
+function getStaticBombs(level) { 
+    const n = parseInt(level) || 1; 
+    let html = ''; 
+    for(let i=0; i<n; i++) html += `<img src="brick.png" class="static-brick-img" alt="brick">`; 
+    return html; 
+}
+
+function createInteractiveBombs(newsId) {
+    const container = document.createElement('div');
+    container.className = 'card-bombs';
+    
+    if (!explodedState[newsId]) explodedState[newsId] = [false, false, false];
+    
+    for(let i=0; i<3; i++) {
+        const bombWrap = document.createElement('div');
+        bombWrap.className = 'bomb-container';
+        if (explodedState[newsId][i]) bombWrap.classList.add('exploded');
+        
+        bombWrap.addEventListener('click', (e) => toggleBomb(e, bombWrap, newsId, i));
+        
+        const imgBrick = document.createElement('img');
+        imgBrick.src = 'brick.png';
+        imgBrick.className = 'bomb-icon-img';
+        imgBrick.alt = 'Boom Brick';
+        
+        const imgBoom = document.createElement('img');
+        imgBoom.src = 'boom.png';
+        imgBoom.className = 'boom-img';
+        imgBoom.alt = 'Explosion';
+        
+        bombWrap.appendChild(imgBrick);
+        bombWrap.appendChild(imgBoom);
+        container.appendChild(bombWrap);
+    }
+    return container;
+}
+
 function showLoader() { document.getElementById('loader').style.display = 'block'; }
 function hideLoader() { document.getElementById('loader').style.display = 'none'; }
-function toggleBomb(e, el, newsId, index) { e.stopPropagation(); explodedState[newsId][index] = !explodedState[newsId][index]; const isExploded = explodedState[newsId][index]; if(isExploded) el.classList.add('exploded'); else el.classList.remove('exploded'); if (currentActiveNewsId === newsId) { const modalBombs = document.getElementById('viewInteractiveBombs'); if(modalBombs) modalBombs.innerHTML = getInteractiveBombs(newsId); } const card = document.querySelector(`.card[data-id="${newsId}"]`) || document.querySelector(`.blog-card[data-id="${newsId}"]`); if (card) { const bombContainer = card.querySelector('.card-bombs'); if (bombContainer) bombContainer.innerHTML = getInteractiveBombs(newsId); } }
+
+// TOAST NOTIFICATIONS
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    let iconHTML = '';
+    if (type === 'success') {
+        iconHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+    } else if (type === 'boom') {
+        iconHTML = `<img src="boom.png" alt="boom" style="width: 24px; height: 24px; object-fit: contain;">`;
+    }
+    
+    toast.innerHTML = `${iconHTML}<span>${message}</span>`;
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'toastOut 0.4s forwards';
+        setTimeout(() => { if(container.contains(toast)) container.removeChild(toast); }, 400);
+    }, 3000);
+}
+
+// SKELETON LOADING
+function renderSkeletons() {
+    const container = document.getElementById('newsGrid');
+    container.innerHTML = '';
+    const skeletonCount = window.innerWidth > 1024 ? 8 : 4;
+    for(let i=0; i<skeletonCount; i++) {
+        const div = createElement('div', 'skeleton-card');
+        div.innerHTML = `<div class="skeleton skeleton-image"></div><div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text short"></div>`;
+        container.appendChild(div);
+    }
+}
+
+function toggleBomb(e, el, newsId, index) { 
+    e.stopPropagation(); 
+    explodedState[newsId][index] = !explodedState[newsId][index]; 
+    localStorage.setItem('explodedState', JSON.stringify(explodedState));
+
+    if(explodedState[newsId][index]) {
+        el.classList.add('exploded'); 
+        showToast("BOOM!", "boom");
+    } else {
+        el.classList.remove('exploded'); 
+    }
+    
+    // Sincronizza modale se aperto
+    if (currentActiveNewsId === newsId) { 
+        const modalBombs = document.getElementById('viewInteractiveBombs'); 
+        if(modalBombs) {
+            modalBombs.innerHTML = '';
+            modalBombs.appendChild(createInteractiveBombs(newsId));
+        }
+    } 
+}
+
 async function checkSession() { if(!sbClient) return; try { const { data, error } = await sbClient.auth.getSession(); if (error) updateAuthUI(null); else updateAuthUI(data.session); sbClient.auth.onAuthStateChange((event, session) => { if (event === 'SIGNED_OUT' || event === 'USER_DELETED') updateAuthUI(null); else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') updateAuthUI(session); }); } catch (err) { updateAuthUI(null); } }
 
 function updateAuthUI(session) { 
     isAdmin = !!session;
     userRole = null;
-
     if (isAdmin && session.user) {
-        if (session.user.email === 'dreamnbricks@gmail.com') {
-            userRole = 'ideas_editor';
-        } else {
-            userRole = 'superadmin'; 
-        }
+        userRole = session.user.email === 'dreamnbricks@gmail.com' ? 'ideas_editor' : 'superadmin';
     }
     
     const authIcon = document.getElementById('authIcon'); 
@@ -69,20 +167,11 @@ function updateAuthUI(session) {
         setAdminMode('management'); 
         userModeList.style.display = 'none';
         userModeSection.style.display = 'none';
-
-        if (userRole === 'ideas_editor') {
-            document.getElementById('btnAddNewsLive').style.display = 'none';
-        } else {
-            document.getElementById('btnAddNewsLive').style.display = 'block';
-        }
-
+        document.getElementById('btnAddNewsLive').style.display = userRole === 'ideas_editor' ? 'none' : 'block';
     } else { 
         document.body.classList.remove('is-admin'); 
         authIcon.innerHTML = ICON_LOCKED; 
-        
-        // FORZA VISTA BLOG PER UTENTI
         currentViewMode = 'blog'; 
-        
         userModeList.style.display = 'block';
         userModeSection.style.display = 'flex';
         document.getElementById('btnAddNewsLive').style.display = 'none';
@@ -93,11 +182,8 @@ function updateAuthUI(session) {
 }
 
 function setAdminMode(mode) {
-    if(!isAdmin) return; // Solo admin può cambiare modalità
-
-    // Admin vede Grid in management, Blog in user view
+    if(!isAdmin) return;
     currentViewMode = (mode === 'management') ? 'grid' : 'blog';
-    
     document.querySelectorAll('.live-list.admin-only .live-item').forEach(el => el.classList.remove('active'));
     if(mode === 'management') {
         document.getElementById('btnAdminMode').classList.add('active');
@@ -157,9 +243,7 @@ async function loadLives() {
         } 
 
         let canEditLive = isAdmin;
-        if (userRole === 'ideas_editor' && type !== 'ideas') {
-            canEditLive = false;
-        }
+        if (userRole === 'ideas_editor' && type !== 'ideas') canEditLive = false;
         
         let actionButtons = '';
         if (canEditLive) {
@@ -168,11 +252,7 @@ async function loadLives() {
         
         li.innerHTML = `<div class="live-item-content" onclick="selectLive({id: ${live.id}, name: '${live.name.replace(/'/g, "\\'")}', type: '${type}'})">${thumbHTML}<div class="live-info"><span class="live-name">${live.name}</span><span class="live-date">${live.live_date || ''}</span></div></div>${actionButtons}`; 
         
-        if (type === 'ideas') {
-            listIdeas.appendChild(li);
-        } else {
-            listNews.appendChild(li);
-        }
+        if (type === 'ideas') listIdeas.appendChild(li); else listNews.appendChild(li);
     }); 
     
     if(allLives.length > 0 && !activeLiveId) loadLatestLivePreview(allLives[0].id); 
@@ -182,12 +262,8 @@ async function loadLatestLivePreview(liveId) { if(!sbClient || !liveId) return; 
 
 async function createNewLive(type) { 
     if(!isAdmin) return;
-    if (userRole === 'ideas_editor' && type !== 'ideas') {
-        return alert("Permesso negato: Puoi creare solo live Ideas.");
-    }
-
-    const name = prompt(`Nome Nuova ${type === 'ideas' ? 'Ideas' : 'News'} Live:`); 
-    if(!name) return; 
+    if (userRole === 'ideas_editor' && type !== 'ideas') return alert("Permesso negato: Puoi creare solo live Ideas.");
+    const name = prompt(`Nome Nuova ${type === 'ideas' ? 'Ideas' : 'News'} Live:`); if(!name) return; 
     const dateStr = prompt("Data Live (YYYY-MM-DD):", new Date().toISOString().split('T')[0]); 
     const ytLink = prompt("Link YouTube (Opzionale):"); 
     showLoader(); 
@@ -198,60 +274,39 @@ async function createNewLive(type) {
 async function renameLive(e, id, oldName, oldDate, oldLink) { e.stopPropagation(); if(!isAdmin) return; const newName = prompt("Nuovo nome Live:", oldName); const newDate = prompt("Nuova data Live (YYYY-MM-DD):", oldDate); const newLink = prompt("Nuovo Link YouTube:", oldLink); if(newName && newDate) { showLoader(); const { error } = await sbClient.from('lives').update({ name: newName, live_date: newDate, youtube_link: newLink }).eq('id', id); if(!error) loadLives(); else { alert(error.message); hideLoader(); } } }
 async function deleteLive(e, id) { e.stopPropagation(); if(!isAdmin) return; if(confirm("Eliminare live e tutti i contenuti?")) { showLoader(); await sbClient.from('news').delete().eq('live_id', id); await sbClient.from('lives').delete().eq('id', id); if(activeLiveId === id) { activeLiveId = null; document.getElementById('emptyState').style.display = 'flex'; document.getElementById('mainHeader').style.display = 'none'; document.getElementById('newsGrid').innerHTML = ''; } loadLives(); hideLoader(); } }
 
-
 function selectLive(live) {
     if(window.innerWidth < 1024) document.getElementById('sidebar').classList.add('collapsed');
-    
     activeLiveId = live.id;
     activeLiveType = live.type || 'news';
     
     document.querySelectorAll('.live-list .live-item').forEach(el => el.classList.remove('active'));
     const items = document.querySelectorAll('.live-list .live-item');
-    items.forEach(i => {
-        if(i.innerText.includes(live.name)) i.classList.add('active');
-    });
-    
-    // Se è grid (admin), sblocca.
-    if(currentViewMode === 'grid') {
-        document.getElementById('sidebar').classList.remove('locked');
-    }
+    items.forEach(i => { if(i.innerText.includes(live.name)) i.classList.add('active'); });
+    if(currentViewMode === 'grid') document.getElementById('sidebar').classList.remove('locked');
     
     document.getElementById('emptyState').style.display = 'none';
     document.getElementById('mainHeader').style.display = 'flex';
     document.getElementById('headerTitle').innerText = live.name;
     document.getElementById('stickyFilterContainer').style.display = 'block';
 
-    // MODIFICA: Gestione loghi header
     const secondaryLogo = document.getElementById('secondaryLogo');
     if (secondaryLogo) {
         secondaryLogo.style.display = 'block';
-        if (activeLiveType === 'ideas') {
-            secondaryLogo.src = 'logo_dream.jpg';
-        } else {
-            secondaryLogo.src = 'logo_itavix.png';
-        }
+        secondaryLogo.src = activeLiveType === 'ideas' ? 'logo_dream.jpg' : 'logo_itavix.png';
     }
 
     const addBtn = document.getElementById('btnMainAddNews');
     if (isAdmin) {
-        if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') {
-            addBtn.style.display = 'none';
-        } else {
-            addBtn.style.display = 'flex';
-        }
+        addBtn.style.display = (userRole === 'ideas_editor' && activeLiveType !== 'ideas') ? 'none' : 'flex';
     } else {
         addBtn.style.display = 'none';
     }
-    
     loadNews(live.id);
 }
 
 function switchToUserMode() {
     if(window.innerWidth < 1024) document.getElementById('sidebar').classList.add('collapsed');
-    
-    // FORZA BLOG
     currentViewMode = 'blog';
-    
     document.getElementById('sidebar').classList.add('locked');
     document.querySelectorAll('.live-item').forEach(el => el.classList.remove('active'));
     document.getElementById('btnUserLive').classList.add('active');
@@ -260,43 +315,59 @@ function switchToUserMode() {
     document.getElementById('headerTitle').innerText = "Live Utenti";
     document.getElementById('stickyFilterContainer').style.display = 'block';
     document.getElementById('btnMainAddNews').style.display = 'none'; 
-
-    // Nascondi logo secondario in modalità utente/generica se necessario, 
-    // oppure mantieni l'ultimo impostato. Per sicurezza lo nascondiamo o lasciamo default.
     const secondaryLogo = document.getElementById('secondaryLogo');
     if(secondaryLogo) secondaryLogo.style.display = 'none';
-
-    if(allLives.length > 0) {
-        activeLiveId = allLives[0].id;
-        loadNews(activeLiveId);
-    }
+    if(allLives.length > 0) { activeLiveId = allLives[0].id; loadNews(activeLiveId); }
 }
 
 function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
 
 async function loadNews(liveId) {
-    showLoader();
+    // SKELETON LOADING
+    renderSkeletons();
+    
+    // OPTIMIZATION: Removed 'description' and 'body_images' from initial fetch
     const { data: news, error } = await sbClient
         .from('news')
-        .select('id, live_id, title, category, likelihood, cover_image, description, order, is_online, votes')
+        .select('id, live_id, title, category, likelihood, cover_image, order, is_online, votes')
         .eq('live_id', liveId)
         .order('order', { ascending: true });
-    if (error) { alert(error.message); hideLoader(); return; }
+    if (error) { alert(error.message); return; }
     cachedNews = news; 
     news.forEach(n => { if(n.category) allCategories.add(n.category); });
     refreshUI();
-    hideLoader();
 }
 
-async function toggleNewsStatus(id, newStatus) {
+async function toggleNewsStatus(id, newStatus, checkbox) {
     if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') return;
 
+    // BLOCCA INPUT
+    checkbox.disabled = true;
+
+    // OPTIMISTIC UPDATE
     const newsItem = cachedNews.find(n => n.id === id);
     if (newsItem) newsItem.is_online = newStatus;
-    refreshUI(); 
+    
+    // NOTA: Non chiamiamo refreshUI() qui per evitare di distruggere il checkbox mentre è in loading.
+    // L'utente vede lo switch muoversi (nativo), ma la card cambierà stile (offline/online opacity) solo dopo la conferma server.
+
     const { error } = await sbClient.from('news').update({ is_online: newStatus }).eq('id', id);
-    if (error) { alert("Errore aggiornamento"); if (newsItem) newsItem.is_online = !newStatus; refreshUI(); }
+    
+    if (error) { 
+        // REVERT ON ERROR
+        alert("Errore aggiornamento: " + error.message); 
+        if (newsItem) newsItem.is_online = !newStatus; 
+        checkbox.checked = !newStatus;
+    } else {
+        showToast(`Stato news aggiornato: ${newStatus ? 'ONLINE' : 'OFFLINE'}`, 'success');
+    }
+    
+    // SBLOCCA E AGGIORNA UI
+    checkbox.disabled = false;
+    refreshUI(); 
 }
+
+function handleSearch(term) { currentSearchTerm = term.toLowerCase(); refreshUI(); }
 
 function refreshUI() {
     const liveCategories = new Set();
@@ -304,26 +375,17 @@ function refreshUI() {
     renderNavPills(liveCategories);
     if (currentFilter !== 'Tutti' && !liveCategories.has(currentFilter)) currentFilter = 'Tutti';
     updatePillsState();
-    
-    if(currentViewMode === 'blog') {
-        renderBlogFromCache();
-    } else {
-        renderGridFromCache();
-    }
+    if(currentViewMode === 'blog') renderBlogFromCache(); else renderGridFromCache();
 }
 
 function renderNavPills(liveCats) {
     const container = document.getElementById('navPillsContainer');
     container.innerHTML = '';
-    const allBtn = document.createElement('div');
-    allBtn.className = 'nav-item';
-    allBtn.innerText = 'Tutti';
+    const allBtn = createElement('div', 'nav-item', 'Tutti');
     allBtn.onclick = () => filterNews('Tutti');
     container.appendChild(allBtn);
     liveCats.forEach(cat => {
-        const btn = document.createElement('div');
-        btn.className = 'nav-item';
-        btn.innerText = cat;
+        const btn = createElement('div', 'nav-item', cat);
         btn.onclick = () => filterNews(cat);
         container.appendChild(btn);
     });
@@ -334,77 +396,89 @@ function updatePillsState() {
     });
 }
 
+// RENDERING DOM OTTIMIZZATO (DocumentFragment + createElement)
 function renderGridFromCache() {
     const grid = document.getElementById('newsGrid');
     grid.className = 'grid-container';
     grid.innerHTML = '';
-    let filtered = cachedNews;
-    if(currentFilter !== 'Tutti') filtered = cachedNews.filter(n => n.category === currentFilter);
-    if (!isAdmin) filtered = filtered.filter(n => n.is_online === true);
-
-    let canEditContent = isAdmin;
-    if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') canEditContent = false;
+    
+    let filtered = filterData();
+    let canEditContent = checkEditPermissions();
 
     const fragment = document.createDocumentFragment();
     filtered.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'card';
+        const card = createElement('div', 'card');
         card.dataset.id = item.id; 
         if (isAdmin && !item.is_online) card.classList.add('offline-mode');
         
-        // DRAG & DROP ATTIVO PER TUTTI
-        card.draggable = true; 
-        card.addEventListener('dragstart', handleDragStart);
-        card.addEventListener('dragover', handleDragOver);
-        card.addEventListener('drop', handleDrop);
-        card.addEventListener('dragend', handleDragEnd);
-        
-        card.onclick = (e) => { 
+        setupDragDrop(card);
+        card.addEventListener('click', (e) => { 
             if(e.target.closest('.admin-toggle-container') || e.target.closest('.bomb-container') || e.target.closest('.trophy-container') || card.classList.contains('dragging')) return;
             openViewModal(item); 
-        }; 
+        });
+
+        const imgWrapper = createElement('div', 'card-image-wrapper');
         
-        let toggleHTML = '';
+        const bgBlur = createElement('img', 'card-bg-blur');
+        bgBlur.src = item.cover_image || '';
+        
+        const fade = createElement('div', 'fade-overlay');
+        
+        const mainImg = createElement('img', 'card-image-small');
+        mainImg.src = item.cover_image || '';
+        mainImg.loading = "lazy";
+        mainImg.alt = item.title;
+
+        imgWrapper.append(bgBlur, fade, mainImg);
+
         if (isAdmin && canEditContent) {
-            toggleHTML = `<div class="admin-toggle-container" onclick="event.stopPropagation()">
-                    <span class="toggle-status-label">${item.is_online ? 'ON' : 'OFF'}</span>
-                    <label class="apple-switch"><input type="checkbox" ${item.is_online ? 'checked' : ''} onchange="toggleNewsStatus(${item.id}, this.checked)"><span class="slider"></span></label>
-                </div>`;
+            const toggleContainer = createElement('div', 'admin-toggle-container');
+            toggleContainer.onclick = (e) => e.stopPropagation();
+            
+            const label = createElement('span', 'toggle-status-label', item.is_online ? 'ON' : 'OFF');
+            const switchLabel = createElement('label', 'apple-switch');
+            const input = createElement('input');
+            input.type = 'checkbox';
+            input.checked = item.is_online;
+            input.onchange = function() { toggleNewsStatus(item.id, this.checked, this); };
+            
+            const slider = createElement('span', 'slider');
+            switchLabel.append(input, slider);
+            toggleContainer.append(label, switchLabel);
+            imgWrapper.appendChild(toggleContainer);
         }
 
-        const hasVoted = localStorage.getItem(`vote_${item.id}`) === 'true';
-        const voteClass = hasVoted ? 'voted' : '';
-
-        const titleParts = item.title.split(' ');
-        const firstWord = titleParts[0] || '';
-        const restOfTitle = titleParts.slice(1).join(' ');
-        const titleHtml = `<span style="color: var(--text-main); font-weight: 800;">${firstWord}</span> <span style="color: var(--text-sec); font-weight: 500;">${restOfTitle}</span>`;
-        const bg = item.cover_image ? item.cover_image : '';
+        const content = createElement('div', 'card-content');
         
-        card.innerHTML = `
-            <div class="card-image-wrapper">
-                <div class="fade-overlay"></div>
-                <img src="${bg}" class="card-image-small" loading="lazy" alt="${item.title}">
-                ${toggleHTML}
-            </div>
-            <div class="card-content">
-                <div class="card-meta-row">
-                    <div style="display:flex; align-items:center;">
-                        <span class="card-category">${item.category}</span>
-                        ${getStaticBombs(item.likelihood)}
-                    </div>
-                    <div class="trophy-container ${voteClass}" onclick="toggleBestNews(event, ${item.id}, this)">
-                        <svg class="trophy-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
-                        </svg>
-                    </div>
-                </div>
-                <div class="card-meta-row" style="margin-top: -5px; margin-bottom: 8px;">
-                     <div class="card-bombs">${getInteractiveBombs(item.id)}</div>
-                </div>
-                <h3 class="card-title">${titleHtml}</h3>
-            </div>
-        `;
+        const metaRow = createElement('div', 'card-meta-row');
+        const leftMeta = createElement('div');
+        leftMeta.style.display = 'flex';
+        leftMeta.style.alignItems = 'center';
+        
+        const catSpan = createElement('span', 'card-category', item.category);
+        const staticBombs = createElement('span');
+        staticBombs.innerHTML = getStaticBombs(item.likelihood);
+        leftMeta.append(catSpan, staticBombs);
+
+        const trophyContainer = createElement('div', 'trophy-container');
+        if(localStorage.getItem(`vote_${item.id}`) === 'true') trophyContainer.classList.add('voted');
+        trophyContainer.innerHTML = `<svg class="trophy-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>`;
+        trophyContainer.addEventListener('click', (e) => toggleBestNews(e, item.id, trophyContainer));
+
+        metaRow.append(leftMeta, trophyContainer);
+
+        const bombRow = createElement('div', 'card-meta-row');
+        bombRow.style.marginTop = '-5px';
+        bombRow.appendChild(createInteractiveBombs(item.id));
+
+        // SECURITY: Sanitizing Title
+        const safeTitle = DOMPurify.sanitize(item.title);
+        const titleHtml = `<span style="color: var(--text-main); font-weight: 800;">${safeTitle.split(' ')[0] || ''}</span> <span style="color: var(--text-sec); font-weight: 500;">${safeTitle.split(' ').slice(1).join(' ')}</span>`;
+        const title = createElement('h3', 'card-title');
+        title.innerHTML = titleHtml;
+
+        content.append(metaRow, bombRow, title);
+        card.append(imgWrapper, content);
         fragment.appendChild(card);
     });
     grid.appendChild(fragment);
@@ -415,197 +489,256 @@ function renderBlogFromCache() {
     container.className = 'blog-container';
     container.innerHTML = '';
     
-    let filtered = cachedNews;
-    if(currentFilter !== 'Tutti') filtered = cachedNews.filter(n => n.category === currentFilter);
-    if (!isAdmin) filtered = filtered.filter(n => n.is_online === true);
-
-    let canEditContent = isAdmin;
-    if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') canEditContent = false;
+    let filtered = filterData();
+    let canEditContent = checkEditPermissions();
 
     const fragment = document.createDocumentFragment();
     filtered.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'blog-card';
+        const card = createElement('div', 'blog-card');
         card.dataset.id = item.id;
+        setupDragDrop(card);
         
-        // DRAG & DROP ATTIVO PER TUTTI
-        card.draggable = true; 
-        card.addEventListener('dragstart', handleDragStart);
-        card.addEventListener('dragover', handleDragOver);
-        card.addEventListener('drop', handleDrop);
-        card.addEventListener('dragend', handleDragEnd);
-        
-        card.onclick = (e) => { 
+        card.addEventListener('click', (e) => { 
             if(e.target.closest('.admin-toggle-container') || e.target.closest('.bomb-container') || e.target.closest('.trophy-container')) return;
             openViewModal(item); 
-        };
+        });
 
-        let toggleHTML = '';
+        const imgWrapper = createElement('div', 'blog-image-wrapper');
+        const bgBlur = createElement('img', 'card-bg-blur'); bgBlur.src = item.cover_image || '';
+        const mainImg = createElement('img', 'blog-image'); mainImg.src = item.cover_image || ''; mainImg.loading = "lazy";
+        imgWrapper.append(bgBlur, mainImg);
+
         if (isAdmin && canEditContent) {
-            toggleHTML = `<div class="admin-toggle-container" onclick="event.stopPropagation()" style="top:10px; right:10px;">
-                    <label class="apple-switch"><input type="checkbox" ${item.is_online ? 'checked' : ''} onchange="toggleNewsStatus(${item.id}, this.checked)"><span class="slider"></span></label>
-                </div>`;
+            const toggleContainer = createElement('div', 'admin-toggle-container');
+            toggleContainer.style.top = '10px'; toggleContainer.style.right = '10px';
+            toggleContainer.onclick = (e) => e.stopPropagation();
+            const switchLabel = createElement('label', 'apple-switch');
+            const input = createElement('input'); input.type = 'checkbox'; input.checked = item.is_online;
+            input.onchange = function() { toggleNewsStatus(item.id, this.checked, this); };
+            switchLabel.append(input, createElement('span', 'slider'));
+            toggleContainer.appendChild(switchLabel);
+            imgWrapper.appendChild(toggleContainer);
         }
 
-        const hasVoted = localStorage.getItem(`vote_${item.id}`) === 'true';
-        const voteClass = hasVoted ? 'voted' : '';
-        const bg = item.cover_image ? item.cover_image : '';
+        const content = createElement('div', 'blog-content');
         
-        let plainText = item.description.replace(/\[\[IMMAGINE \d+\]\]/g, '').replace(/<[^>]*>?/gm, '').trim();
-        if(plainText.length > 120) plainText = plainText.substring(0, 120) + "...";
+        const metaRow = createElement('div', 'blog-meta-row');
+        const catSpan = createElement('span', 'blog-category', item.category);
+        const trophyContainer = createElement('div', 'trophy-container');
+        if(localStorage.getItem(`vote_${item.id}`) === 'true') trophyContainer.classList.add('voted');
+        trophyContainer.innerHTML = `<svg class="trophy-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>`;
+        trophyContainer.addEventListener('click', (e) => toggleBestNews(e, item.id, trophyContainer));
+        metaRow.append(catSpan, trophyContainer);
 
-        card.innerHTML = `
-            <div class="blog-image-wrapper">
-                <img src="${bg}" class="blog-image" loading="lazy" alt="${item.title}">
-                ${toggleHTML}
-            </div>
-            <div class="blog-content">
-                <div class="blog-meta-row">
-                    <span class="blog-category">${item.category}</span>
-                    <div class="trophy-container ${voteClass}" onclick="toggleBestNews(event, ${item.id}, this)">
-                        <svg class="trophy-icon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
-                        </svg>
-                    </div>
-                </div>
-                <h3 class="blog-title">${item.title}</h3>
-                <div style="margin-bottom: 15px;">${getStaticBombs(item.likelihood)}</div>
-                <p class="blog-desc">${plainText}</p>
-                <div class="card-bombs" style="margin-top: auto; padding-top: 10px;">${getInteractiveBombs(item.id)}</div>
-            </div>
-        `;
+        const title = createElement('h3', 'blog-title');
+        title.textContent = item.title;
+
+        const bombsDiv = createElement('div');
+        bombsDiv.style.marginBottom = '15px';
+        bombsDiv.innerHTML = getStaticBombs(item.likelihood);
+
+        // OPTIMIZATION: Description is not fetched in list. Show placeholder.
+        const descPlaceholder = createElement('p', 'blog-desc', 'Clicca per leggere i dettagli...');
+        
+        const interactiveBombs = createElement('div', 'card-bombs');
+        interactiveBombs.style.marginTop = 'auto';
+        interactiveBombs.style.paddingTop = '10px';
+        interactiveBombs.appendChild(createInteractiveBombs(item.id));
+
+        content.append(metaRow, title, bombsDiv, descPlaceholder, interactiveBombs);
+        card.append(imgWrapper, content);
         fragment.appendChild(card);
     });
     container.appendChild(fragment);
 }
 
+function filterData() {
+    let filtered = cachedNews;
+    if(currentFilter !== 'Tutti') filtered = filtered.filter(n => n.category === currentFilter);
+    if(currentSearchTerm) filtered = filtered.filter(n => n.title.toLowerCase().includes(currentSearchTerm));
+    if (!isAdmin) filtered = filtered.filter(n => n.is_online === true);
+    return filtered;
+}
+
+function checkEditPermissions() {
+    if(!isAdmin) return false;
+    if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') return false;
+    return true;
+}
+
 function filterNews(cat) { currentFilter = cat; refreshUI(); }
 
-// --- BEST NEWS LOGIC ---
+// --- VOTING SYSTEM ---
 async function toggleBestNews(e, newsId, el) {
     e.stopPropagation();
-    const storageKey = `vote_${newsId}`;
-    const isVoted = localStorage.getItem(storageKey) === 'true';
-    
-    if (!isVoted) {
-        el.classList.add('voted');
-        localStorage.setItem(storageKey, 'true');
-    } else {
+    const newsItem = cachedNews.find(n => n.id === newsId);
+    const liveId = newsItem ? newsItem.live_id : activeLiveId;
+    if (!liveId) return; 
+
+    const storageKeyVote = `vote_${newsId}`;
+    const storageKeyLive = `vote_live_${liveId}`;
+    const isAlreadyVoted = localStorage.getItem(storageKeyVote) === 'true';
+
+    if (isAlreadyVoted) {
         el.classList.remove('voted');
-        localStorage.removeItem(storageKey);
+        localStorage.removeItem(storageKeyVote);
+        if (String(localStorage.getItem(storageKeyLive)) === String(newsId)) localStorage.removeItem(storageKeyLive);
+        showToast("Voto rimosso", "success");
+        if(sbClient) {
+            const { data } = await sbClient.from('news').select('votes').eq('id', newsId).single();
+            if(data) await sbClient.from('news').update({ votes: Math.max(0, data.votes - 1) }).eq('id', newsId);
+        }
+        return;
+    } 
+    
+    const previousNewsId = localStorage.getItem(storageKeyLive);
+    if (previousNewsId && String(previousNewsId) !== String(newsId)) {
+        localStorage.removeItem(`vote_${previousNewsId}`);
+        const oldCard = document.querySelector(`.card[data-id="${previousNewsId}"]`) || document.querySelector(`.blog-card[data-id="${previousNewsId}"]`);
+        if (oldCard) {
+            const oldTrophy = oldCard.querySelector('.trophy-container');
+            if (oldTrophy) oldTrophy.classList.remove('voted');
+        }
+        if(sbClient) {
+            const { data } = await sbClient.from('news').select('votes').eq('id', previousNewsId).single();
+            if(data) await sbClient.from('news').update({ votes: Math.max(0, data.votes - 1) }).eq('id', previousNewsId);
+        }
     }
 
-    if(!sbClient) return;
-    const { data, error } = await sbClient.from('news').select('votes').eq('id', newsId).single();
-    if(!error) {
-        const current = data.votes || 0;
-        const next = isVoted ? Math.max(0, current - 1) : current + 1;
-        await sbClient.from('news').update({ votes: next }).eq('id', newsId);
+    el.classList.add('voted');
+    localStorage.setItem(storageKeyVote, 'true');
+    localStorage.setItem(storageKeyLive, String(newsId));
+    showToast("Voto registrato!", "success");
+
+    if(sbClient) {
+        const { data } = await sbClient.from('news').select('votes').eq('id', newsId).single();
+        if(data) await sbClient.from('news').update({ votes: data.votes + 1 }).eq('id', newsId);
     }
 }
 
 async function openBestNewsModal() {
     if(!sbClient) return;
     showLoader();
-    const { data: bestNews, error } = await sbClient
-        .from('news')
-        .select('id, title, cover_image, votes, live_id')
-        .gt('votes', 0)
-        .order('votes', { ascending: false })
-        .limit(100);
-    
+    const { data: bestNews, error } = await sbClient.from('news').select('id, title, cover_image, votes, live_id').gt('votes', 0).order('votes', { ascending: false }).limit(100);
     hideLoader();
     if(error) return alert("Errore caricamento classifica");
-    
     allVotedNews = bestNews || [];
     currentHoFType = activeLiveType || 'news';
-
-    const container = document.getElementById('bestNewsListContainer');
-    // Init Structure
-    container.innerHTML = `
-        <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-            <div class="nav-pills" style="width: auto;">
-                <div class="nav-item ${currentHoFType === 'news' ? 'active' : ''}" onclick="switchHoF('news')">News</div>
-                <div class="nav-item ${currentHoFType === 'ideas' ? 'active' : ''}" onclick="switchHoF('ideas')">Ideas</div>
-            </div>
-        </div>
-        <div id="hofListContent"></div>
-    `;
     
+    const container = document.getElementById('bestNewsListContainer');
+    let resetButtonHTML = isAdmin ? `<div style="margin-top: 30px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 20px; text-align: center;"><button class="btn btn-danger" style="width: auto; padding: 10px 20px; font-size: 14px;" onclick="resetVotesForCurrentLive()">🗑️ AZZERA VOTI LIVE</button><p style="font-size: 11px; color: var(--text-sec); margin-top: 8px;">Attenzione: azzera i voti della live corrente.</p></div>` : '';
+
+    container.innerHTML = `<div style="display: flex; justify-content: center; margin-bottom: 20px;"><div class="nav-pills" style="width: auto;"><div class="nav-item ${currentHoFType === 'news' ? 'active' : ''}" onclick="switchHoF('news')">News</div><div class="nav-item ${currentHoFType === 'ideas' ? 'active' : ''}" onclick="switchHoF('ideas')">Ideas</div></div></div><div id="hofListContent"></div>${resetButtonHTML}`;
     switchHoF(currentHoFType);
     document.getElementById('bestNewsModal').classList.add('active');
 }
 
+async function resetVotesForCurrentLive() {
+    if(!isAdmin || !activeLiveId) return;
+    if(!confirm("SEI SICURO? Azzerare tutti i voti per questa LIVE?")) return;
+    showLoader();
+    const { error } = await sbClient.from('news').update({ votes: 0 }).eq('live_id', activeLiveId);
+    if(error) { alert("Errore reset: " + error.message); } 
+    else {
+        cachedNews.forEach(n => localStorage.removeItem(`vote_${n.id}`));
+        localStorage.removeItem(`vote_live_${activeLiveId}`);
+        showToast("Voti azzerati", "success");
+        loadNews(activeLiveId);
+        closeBestNewsModal();
+    }
+    hideLoader();
+}
+
 function switchHoF(type) {
     currentHoFType = type;
-    // Update tabs
-    const tabs = document.querySelectorAll('#bestNewsListContainer .nav-item');
-    tabs.forEach(t => {
-        if(t.innerText.toLowerCase() === type) t.classList.add('active');
-        else t.classList.remove('active');
+    
+    // Aggiorna lo stato dei tab (News/Ideas)
+    document.querySelectorAll('#bestNewsListContainer .nav-item').forEach(t => {
+        if(t.innerText.toLowerCase() === type) t.classList.add('active'); else t.classList.remove('active');
     });
 
     const listContainer = document.getElementById('hofListContent');
     
-    const liveTypeMap = {};
+    // Mappa per recuperare i tipi di live
+    const liveTypeMap = {}; 
     allLives.forEach(l => liveTypeMap[l.id] = (l.type || 'news')); 
+    
+    // Filtra le news votate in base al tipo selezionato (news o ideas)
+    const filtered = allVotedNews.filter(n => (liveTypeMap[n.live_id] || 'news') === type);
 
-    const filtered = allVotedNews.filter(n => {
-        const lType = liveTypeMap[n.live_id] || 'news'; 
-        return lType === type;
-    });
-
-    if(filtered.length === 0) {
-        listContainer.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-sec);">Nessuna classifica per questa categoria.</div>';
-        return;
+    // Gestione stato vuoto
+    if(filtered.length === 0) { 
+        listContainer.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-sec); font-size:15px;">Nessuna classifica per questa categoria.</div>'; 
+        return; 
     }
 
-    const liveNameMap = {};
+    // Mappa per recuperare i nomi delle live
+    const liveNameMap = {}; 
     allLives.forEach(l => liveNameMap[l.id] = l.name);
-
-    let html = '<ul class="ranking-list">';
+    
+    let html = '<ul style="list-style: none; padding: 0; margin: 0;">';
+    
     filtered.forEach((news, index) => {
-        const liveName = liveNameMap[news.live_id] || 'Live passata';
-        const thumb = news.cover_image || 'brick.png';
+        // --- STILE IOS ---
         html += `
-        <li class="ranking-item">
-            <div class="ranking-pos">${index + 1}</div>
-            <img src="${thumb}" class="ranking-thumb" alt="thumb">
-            <div class="ranking-info">
-                <div class="ranking-title">${news.title}</div>
-                <div class="ranking-live">${liveName}</div>
+        <li style="display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05); width: 100%;">
+            
+            <div style="font-size: 18px; font-weight: 700; color: var(--text-sec); width: 30px; text-align: center; flex-shrink: 0; margin-right: 8px;">
+                ${index + 1}
             </div>
-            <div class="ranking-votes">
-                <span class="vote-number">${news.votes}</span>
-                <span class="vote-label">Voti</span>
+
+            <div style="width: 54px; height: 54px; flex-shrink: 0; border-radius: 12px; overflow: hidden; background-color: var(--bg-input); position: relative; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);">
+                <img src="${news.cover_image || 'brick.png'}" style="width: 100%; height: 100%; object-fit: cover; display: block;" loading="lazy">
             </div>
+
+            <div style="flex: 1; min-width: 0; padding: 0 14px; display: flex; flex-direction: column; justify-content: center;">
+                <div style="font-size: 17px; font-weight: 600; color: var(--text-main); line-height: 1.2; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--font);">
+                    ${news.title}
+                </div>
+                <div style="font-size: 13px; color: var(--text-sec); font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    ${liveNameMap[news.live_id] || 'Archivio'}
+                </div>
+            </div>
+
+            <div style="background-color: var(--bg-input); border-radius: 10px; padding: 6px 10px; min-width: 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0;">
+                <span style="font-size: 16px; font-weight: 700; color: var(--text-main); line-height: 1;">${news.votes}</span>
+                <span style="font-size: 9px; text-transform: uppercase; color: var(--text-sec); font-weight: 600; margin-top: 2px;">Voti</span>
+            </div>
+
         </li>`;
     });
+    
     html += '</ul>';
     listContainer.innerHTML = html;
 }
 
 function closeBestNewsModal() { document.getElementById('bestNewsModal').classList.remove('active'); }
 
-
+// FETCH ON DEMAND: Scarica descrizione e immagini solo quando serve
 async function openViewModal(partialItem) {
     currentActiveNewsId = partialItem.id;
-    document.getElementById('viewTitle').innerText = partialItem.title;
-    document.getElementById('viewCategory').innerText = partialItem.category;
+    document.getElementById('viewTitle').textContent = partialItem.title; 
+    document.getElementById('viewCategory').textContent = partialItem.category;
     document.getElementById('viewStaticBombs').innerHTML = getStaticBombs(partialItem.likelihood);
-    document.getElementById('viewInteractiveBombs').innerHTML = getInteractiveBombs(partialItem.id);
+    
+    const modalBombs = document.getElementById('viewInteractiveBombs');
+    modalBombs.innerHTML = '';
+    modalBombs.appendChild(createInteractiveBombs(partialItem.id));
+
     const viewImg = document.getElementById('viewImage');
     viewImg.style.backgroundImage = partialItem.cover_image ? `url('${partialItem.cover_image}')` : 'none';
     if(!partialItem.cover_image) viewImg.style.backgroundColor = '#eee';
     
-    const cleanText = formatDescriptionTextOnly(partialItem.description);
-    document.getElementById('viewDesc').innerHTML = cleanText;
-    document.getElementById('viewImagesContainer').innerHTML = ''; 
-    
+    // SECURITY & OPTIMIZATION: Loading state + Security
+    const viewDesc = document.getElementById('viewDesc');
+    viewDesc.innerHTML = '<div style="color:var(--text-sec); font-style:italic; padding:20px 0;">Caricamento dettagli...</div>';
+    document.getElementById('viewImagesContainer').innerHTML = '';
+
     document.getElementById('viewMode').classList.remove('hidden');
     document.getElementById('editMode').classList.add('hidden');
     document.getElementById('modalOverlay').classList.add('active');
     
+    // UI Mods
     const modalMainCard = document.querySelector('#modalOverlay .modal-card'); 
     if(currentViewMode === 'blog') {
         document.getElementById('modalOverlay').classList.add('fullscreen-mode');
@@ -616,41 +749,39 @@ async function openViewModal(partialItem) {
     }
 
     const btnEditContainer = document.getElementById('btnEditNewsContainer');
-    if (isAdmin) {
-        if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') {
-            btnEditContainer.style.display = 'none';
-        } else {
-            btnEditContainer.style.display = 'flex';
-        }
-    } else {
-        btnEditContainer.style.display = 'none';
-    }
+    if (isAdmin) btnEditContainer.style.display = (userRole === 'ideas_editor' && activeLiveType !== 'ideas') ? 'none' : 'flex';
+    else btnEditContainer.style.display = 'none';
 
-    const { data: fullItem, error } = await sbClient.from('news').select('body_images').eq('id', partialItem.id).single();
+    // FETCH FULL DETAILS (Description & Body Images)
+    const { data: fullItem, error } = await sbClient.from('news').select('description, body_images').eq('id', partialItem.id).single();
+    
     if (!error && fullItem) {
+        // SECURITY: Sanitizing Description using DOMPurify
+        const safeDescription = DOMPurify.sanitize(cleanText(fullItem.description || ''));
+        viewDesc.innerHTML = safeDescription;
+        
         currentViewImages = fullItem.body_images || [];
         if (currentViewImages.length > 0) {
-            setTimeout(() => { document.getElementById('viewImagesContainer').innerHTML = createGalleryButton(currentViewImages.length); }, 100); 
+            document.getElementById('viewImagesContainer').innerHTML = createGalleryButton(currentViewImages.length);
         }
+    } else {
+        viewDesc.textContent = "Errore nel caricamento della descrizione.";
     }
 }
 
-function formatDescriptionTextOnly(text) {
-    if(!text) return '';
-    let s = text.replace(/&/g, "&amp;").replace(/</g, "&lt;");
-    s = s.replace(/(\r\n|\n|\r)*\s*\[\[IMMAGINE \d+\]\]\s*(\r\n|\n|\r)*/g, ''); 
-    return s;
+function cleanText(text) {
+    // Rimuove tag immagini custom per la visualizzazione testuale
+    return text.replace(/\[\[IMMAGINE \d+\]\]/g, '').trim();
 }
 
 function createGalleryButton(count) {
-    return `<div class="image-attachment-pill" onclick="openLightbox(0)">
-        <div class="icon-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
-        <span>Visualizza Galleria (${count} foto)</span></div>`;
+    return `<div class="image-attachment-pill" onclick="openLightbox(0)"><div class="icon-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div><span>Visualizza Galleria (${count} foto)</span></div>`;
 }
 
+// EDITOR LOGIC
 async function openEditModal(id = null) {
     if(!isAdmin) return;
-    if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') return alert("Non hai i permessi per modificare News.");
+    if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') return alert("Permesso negato.");
 
     tempCoverImage = ''; tempBodyImages = [];
     document.getElementById('fileInputCover').value = '';
@@ -659,16 +790,19 @@ async function openEditModal(id = null) {
     document.getElementById('uploadPlaceholder').style.display = 'block';
     const dl = document.getElementById('categoryOptions');
     dl.innerHTML = '';
-    allCategories.forEach(cat => { const opt = document.createElement('option'); opt.value = cat; dl.appendChild(opt); });
+    allCategories.forEach(cat => { const opt = createElement('option'); opt.value = cat; dl.appendChild(opt); });
+
     if(id) {
         showLoader();
+        // Fetch full data for edit if not already fetched
         const { data: item, error } = await sbClient.from('news').select('*').eq('id', id).single();
         if(error) { alert(error.message); hideLoader(); return; }
+        
         document.getElementById('editId').value = item.id;
         document.getElementById('editTitle').value = item.title;
         document.getElementById('editCategory').value = item.category; 
         document.getElementById('editLikelihood').value = item.likelihood || "1";
-        document.getElementById('editDesc').value = item.description; 
+        document.getElementById('editDesc').value = item.description || ""; 
         document.getElementById('btnDelete').style.display = 'block';
         if(item.cover_image) {
             tempCoverImage = item.cover_image;
@@ -695,23 +829,26 @@ function switchToEdit() { openEditModal(currentActiveNewsId); }
 
 async function saveNews() {
     if(!activeLiveId || !isAdmin) return;
-    if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') return alert("Permesso negato");
-
     const idInput = document.getElementById('editId').value;
     const title = document.getElementById('editTitle').value;
     const category = document.getElementById('editCategory').value;
     const likelihood = document.getElementById('editLikelihood').value;
     const rawDescription = document.getElementById('editDesc').value;
+    
     if(!title) return alert("Titolo mancante");
     showLoader();
+    
     const { text: cleanDescription, images: cleanImages } = optimizeContent(rawDescription, tempBodyImages);
     const payload = { title, category, description: cleanDescription, likelihood, cover_image: tempCoverImage, body_images: cleanImages };
+    
     if(idInput) {
         await sbClient.from('news').update(payload).eq('id', idInput);
+        showToast("News aggiornata", "success");
     } else {
         const maxOrder = cachedNews.length > 0 ? Math.max(...cachedNews.map(n=>n.order||0)) : -1;
         payload.live_id = activeLiveId; payload.order = maxOrder + 1; payload.is_online = false;
         await sbClient.from('news').insert([payload]);
+        showToast("News creata", "success");
     }
     if(category) allCategories.add(category);
     loadNews(activeLiveId);
@@ -719,14 +856,16 @@ async function saveNews() {
 }
 
 function optimizeContent(text, images) {
+    // Gestione tag immagini placeholder
     const regex = /\[\[IMMAGINE (\d+)\]\]/g;
-    let matches = [...text.matchAll(regex)];
     let newImages = [];
-    matches.forEach(match => { const originalIndex = parseInt(match[1]) - 1; if (images[originalIndex]) newImages.push(images[originalIndex]); });
     let count = 1;
     let newText = text.replace(regex, (match, number) => {
         const originalIndex = parseInt(number) - 1;
-        if (images[originalIndex]) return `[[TEMP_IMG_${count++}]]`;
+        if (images[originalIndex]) {
+            newImages.push(images[originalIndex]);
+            return `[[TEMP_IMG_${count++}]]`;
+        }
         return ''; 
     });
     newText = newText.replace(/\[\[TEMP_IMG_(\d+)\]\]/g, '[[IMMAGINE $1]]');
@@ -735,38 +874,53 @@ function optimizeContent(text, images) {
 
 async function deleteCurrentNews() {
     if(!isAdmin) return;
-    if (userRole === 'ideas_editor' && activeLiveType !== 'ideas') return alert("Permesso negato");
-    
     if(confirm("Eliminare?")) {
         showLoader();
         await sbClient.from('news').delete().eq('id', currentActiveNewsId);
         loadNews(activeLiveId);
+        showToast("News eliminata", "success");
         closeModal();
     }
 }
 
-function handleCoverUpload(input) {
-    const file = input.files[0]; if(!file) return;
-    resizeImage(file, 500, 0.6, (base64) => {
-        tempCoverImage = base64;
-        document.getElementById('previewImg').src = tempCoverImage;
-        document.getElementById('previewImg').style.display = 'block';
-        document.getElementById('uploadPlaceholder').style.display = 'none';
-    });
+// DRAG & DROP
+function setupDragDrop(el) {
+    el.draggable = true;
+    el.addEventListener('dragstart', handleDragStart);
+    el.addEventListener('dragover', handleDragOver);
+    el.addEventListener('drop', handleDrop);
+    el.addEventListener('dragend', handleDragEnd);
 }
+function handleDragStart(e) { dragSrcEl=this; e.dataTransfer.effectAllowed='move'; this.classList.add('dragging'); }
+function handleDragOver(e) { e.preventDefault(); return false; }
+function handleDrop(e) { e.stopPropagation(); if(dragSrcEl!==this) { swapOrder(parseInt(dragSrcEl.dataset.id), parseInt(this.dataset.id)); } return false; }
+function handleDragEnd() { this.classList.remove('dragging'); }
+async function swapOrder(sId, tId) {
+    const sIdx = cachedNews.findIndex(n=>n.id===sId);
+    const tIdx = cachedNews.findIndex(n=>n.id===tId);
+    if(sIdx>-1 && tIdx>-1) {
+        const [m] = cachedNews.splice(sIdx,1);
+        cachedNews.splice(tIdx,0,m);
+        cachedNews.forEach((n,i)=>n.order=i);
+        refreshUI(); 
+        for(let n of cachedNews) await sbClient.from('news').update({ order: n.order }).eq('id', n.id);
+    }
+}
+
+// IMAGE HANDLING & LIGHTBOX
+function handleCoverUpload(input) { resizeImage(input.files[0], 500, 0.6, (base64) => { tempCoverImage = base64; document.getElementById('previewImg').src = tempCoverImage; document.getElementById('previewImg').style.display='block'; document.getElementById('uploadPlaceholder').style.display='none'; }); }
 function handleBodyImageUpload(input) {
-    const files = input.files; if(!files || files.length === 0) return;
-    Array.from(files).forEach((file, index) => {
+    Array.from(input.files).forEach((file, index) => {
         resizeImage(file, 2048, 0.85, (base64) => {
             tempBodyImages.push(base64);
             const ta = document.getElementById('editDesc');
-            const tag = `\n[[IMMAGINE ${tempBodyImages.length}]]\n`;
-            ta.value = ta.value.substring(0, ta.selectionStart) + tag + ta.value.substring(ta.selectionEnd);
-            if(index===files.length-1) input.value = '';
+            ta.value = ta.value.substring(0, ta.selectionStart) + `\n[[IMMAGINE ${tempBodyImages.length}]]\n` + ta.value.substring(ta.selectionEnd);
+            if(index===input.files.length-1) input.value = '';
         });
     });
 }
 function resizeImage(file, maxWidth, quality, callback) {
+    if(!file) return;
     const reader = new FileReader();
     reader.onload = (e) => {
         const img = new Image();
@@ -781,42 +935,11 @@ function resizeImage(file, maxWidth, quality, callback) {
         }; img.src = e.target.result;
     }; reader.readAsDataURL(file);
 }
-
-function openLightbox(i) {
-    currentLightboxIndex = i; updateLightbox();
-    document.getElementById('lightbox').classList.add('active');
-}
+function openLightbox(i) { currentLightboxIndex = i; updateLightbox(); document.getElementById('lightbox').classList.add('active'); }
 function closeLightbox() { document.getElementById('lightbox').classList.remove('active'); }
-function changeSlide(dir) {
-    currentLightboxIndex += dir;
-    if(currentLightboxIndex < 0) currentLightboxIndex = currentViewImages.length - 1;
-    if(currentLightboxIndex >= currentViewImages.length) currentLightboxIndex = 0;
-    updateLightbox();
-}
-function updateLightbox() {
-    if(currentViewImages[currentLightboxIndex]) {
-        const img = document.getElementById('lightboxImg');
-        img.style.opacity = 0;
-        setTimeout(() => { img.src = currentViewImages[currentLightboxIndex]; img.style.opacity = 1; }, 100);
-    }
-}
+function changeSlide(dir) { currentLightboxIndex += dir; if(currentLightboxIndex < 0) currentLightboxIndex = currentViewImages.length - 1; if(currentLightboxIndex >= currentViewImages.length) currentLightboxIndex = 0; updateLightbox(); }
+function updateLightbox() { if(currentViewImages[currentLightboxIndex]) { const img = document.getElementById('lightboxImg'); img.style.opacity = 0; setTimeout(() => { img.src = currentViewImages[currentLightboxIndex]; img.style.opacity = 1; }, 100); } }
 document.addEventListener('keydown', (e) => { if(document.getElementById('lightbox').classList.contains('active')) { if(e.key==='ArrowLeft') changeSlide(-1); if(e.key==='ArrowRight') changeSlide(1); if(e.key==='Escape') closeLightbox(); } });
-
-function handleDragStart(e) { dragSrcEl=this; e.dataTransfer.effectAllowed='move'; this.classList.add('dragging'); }
-function handleDragOver(e) { e.preventDefault(); return false; }
-function handleDrop(e) { e.stopPropagation(); if(dragSrcEl!==this) { swapOrder(parseInt(dragSrcEl.dataset.id), parseInt(this.dataset.id)); } return false; }
-function handleDragEnd() { this.classList.remove('dragging'); }
-async function swapOrder(sId, tId) {
-    const sIdx = cachedNews.findIndex(n=>n.id===sId);
-    const tIdx = cachedNews.findIndex(n=>n.id===tId);
-    if(sIdx>-1 && tIdx>-1) {
-        const [m] = cachedNews.splice(sIdx,1);
-        cachedNews.splice(tIdx,0,m);
-        cachedNews.forEach((n,i)=>n.order=i);
-        refreshUI(); 
-        for(let n of cachedNews) { await sbClient.from('news').update({ order: n.order }).eq('id', n.id); }
-    }
-}
-
 document.getElementById('modalOverlay').addEventListener('click', (e) => { if(e.target.id === 'modalOverlay') closeModal(); });
+
 initApp();
