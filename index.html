@@ -15,7 +15,8 @@
 </head>
 <body class="text-slate-900">
 
-    <div id="loader" class="loader">Operazione in corso...</div>
+    <div id="loader" class="loader" style="display: none;">Operazione in corso...</div>
+    
     <div id="toastContainer" class="toast-container"></div>
 
     <div id="landingPage">
@@ -97,11 +98,18 @@
                 <button class="add-live-btn admin-only" id="btnAddNewsLive" onclick="createNewLive('news')">+</button>
             </div>
             <ul class="live-list" id="liveListNews"></ul>
+            
             <div class="sidebar-header" style="margin-top: 10px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 20px;">
                 <h2 class="sidebar-title">Ideas Live</h2>
                 <button class="add-live-btn admin-only" id="btnAddIdeasLive" onclick="createNewLive('ideas')">+</button>
             </div>
             <ul class="live-list" id="liveListIdeas"></ul>
+
+            <div class="sidebar-header" style="margin-top: 10px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 20px;">
+                <h2 class="sidebar-title">Eventi Speciali</h2>
+                <button class="add-live-btn admin-only" id="btnAddEventsLive" onclick="createNewLive('events')">+</button>
+            </div>
+            <ul class="live-list" id="liveListEvents"></ul>
             <div class="sidebar-header mt-8 admin-only" style="border-top: 1px solid rgba(0,0,0,0.05); padding-top: 20px;"><h2 class="sidebar-title" style="font-size: 16px; color: var(--text-sec);">Modalità</h2></div>
             <ul class="live-list admin-only">
                 <li class="live-item active" id="btnAdminMode" onclick="setAdminMode('management')">
@@ -252,6 +260,13 @@
                             <div class="ios-row" onclick="document.getElementById('fileInputBody').click()">
                                 <label class="ios-label" style="flex:1; color:var(--accent);">Agg. Foto Corpo</label>
                                 <input type="file" id="fileInputBody" accept="image/*" multiple style="display: none;" onchange="handleBodyImageUpload(this)">
+                            </div>
+                        </div>
+
+                        <div id="tableInputContainer" class="ios-group" style="display:none; margin-bottom: 20px;">
+                            <div class="ios-row" style="height:auto; min-height:120px; align-items:flex-start;">
+                                <label class="ios-label" style="margin-top:10px;">HTML Tabella</label>
+                                <textarea id="editTableHtml" class="ios-textarea" placeholder="Codice HTML colonna sinistra..." style="font-family: monospace; font-size: 13px;"></textarea>
                             </div>
                         </div>
 
